@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "rust",
+  "version": "${version}",
+
+  "name": "Rust",
+  "description": " -- TODO -- ",
+
+  "authors": [
+    "magistermaks"
+  ],
+
+  "contact": {
+    "homepage": "http://darktree.net/",
+    "sources": "https://github.com/magistermaks/mod-rust",
+    "issues": "https://github.com/magistermaks/mod-rust/issues"
+  },
+
+  "license": "GPLv2",
+  "icon": "assets/rust/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.darktree.rust.Initializer"
+    ]
+  },
+  "mixins": [
+    "rust.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.12.12",
+    "fabric": "*",
+    "minecraft": "1.18.x",
+    "java": ">=17"
+  }
+
+}
