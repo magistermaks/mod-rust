@@ -23,6 +23,9 @@
   "entrypoints": {
     "main": [
       "net.darktree.rust.Initializer"
+    ],
+    "client": [
+      "net.darktree.rust.Initializer"
     ]
   },
   "mixins": [
