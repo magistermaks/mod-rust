@@ -24,20 +24,23 @@ public class TestBlockEntityRenderer implements BlockEntityRenderer<TestBlockEnt
 	Identifier id = new Identifier("rust", "example");
 	BakedModel model = ModelHelper.getModel(id);
 
+	ShapeRenderer.Segment[] segments = new ShapeRenderer.Segment[64];
+	long timec = -1;
+
 	public void drawAnimatedArcLine(MatrixStack matrices, VertexConsumer buffer, long tick, float delta, float upward, float x1, float y1, float z1, float x2, float y2, float z2) {
 		upward *= (float) Math.sin((tick * 0.1f + delta * 0.1f) % (Math.PI / 2));
 
-		drawArcLine(matrices, buffer, tick, 3, 0.009f, upward, x1, y1, z1, x2, y2, z2);
+		drawArcLine(matrices, buffer, tick, 3, 0.005f, upward, x1, y1, z1, x2, y2, z2);
 	}
 
 	public void drawArcLine(MatrixStack matrices, VertexConsumer buffer, long seed, int depth, float separation, float upward, float x1, float y1, float z1, float x2, float y2, float z2) {
 		Random random = new Random();
 
-		int segments = 15;
+		int segments = 20;
 		int sides = 4;
-		float jaggedness = 0.3f;
-		float radius = 0.005f;
-		float r = 0.4f, g = 0.5f, b = 0.7f, a = 0.5f;
+		float jaggedness = 0.2f;
+		float radius = 0.002f;
+		float r = 0.4f, g = 0.5f, b = 0.75f, a = 0.5f;
 
 		for(int i = 0; i < depth; i ++) {
 			random.setSeed(seed);
@@ -63,14 +66,14 @@ public class TestBlockEntityRenderer implements BlockEntityRenderer<TestBlockEnt
 			ty = y1 + sy * i + (random.nextFloat() - 0.5f) * jaggedness + offset;
 			tz = z1 + sz * i + (random.nextFloat() - 0.5f) * jaggedness;
 
-			ShapeRenderer.renderPrismAlong(matrices, buffer, count, radius, 0, r, g, b, a, fx, fy, fz, tx, ty, tz);
+			ShapeRenderer.renderPrismAlong(matrices, buffer, count, radius, 0, r, g, b, a, fx, fy, fz, tx, ty, tz, ShapeRenderer.NO_OFFSET);
 
 			fx = tx;
 			fy = ty;
 			fz = tz;
 		}
 
-		ShapeRenderer.renderPrismAlong(matrices, buffer, count, radius, 0, r, g, b, a, fx, fy, fz, x2, y2, z2);
+		ShapeRenderer.renderPrismAlong(matrices, buffer, count, radius, 0, r, g, b, a, fx, fy, fz, x2, y2, z2, ShapeRenderer.NO_OFFSET);
 	}
 
 	@Override
@@ -90,14 +93,32 @@ public class TestBlockEntityRenderer implements BlockEntityRenderer<TestBlockEnt
 
 Random random = new Random(42);
 
+		long time = entity.getWorld().getTime();
+
 //		ShapeRenderer.renderPrismAlong(matrices, buffer, 6, r, 0, cr, cg, cb, 0.35f, 0, 0, 0, x, y, 3);
 
-		drawAnimatedArcLine(matrices, buffer, entity.getWorld().getTime() + 32, tickDelta, 0.65f, 0, 0, 0, x, y, 3);
-		drawAnimatedArcLine(matrices, buffer, entity.getWorld().getTime() + 71, tickDelta, 0.65f, 0, 0, 0, 0, 0, 3);
+		drawAnimatedArcLine(matrices, buffer, time + 32, tickDelta, 0.65f, 0, 0, 0, x, y, 3);
+		drawAnimatedArcLine(matrices, buffer, time + 71, tickDelta, 0.65f, 0, 0, 0, 0, 0, 3);
+
+		if(time != this.timec) {
+			this.timec = time;
+			float jaggedness = 0.1f;
+			random.setSeed(time);
+
+			for(int i = 0; i < 64; i += 1) {
+				this.segments[i] = new ShapeRenderer.Segment((random.nextFloat() - 0.5f) * jaggedness, (random.nextFloat() - 0.5f) * jaggedness);
+			}
+		}
+
+		ShapeRenderer.renderPrismAlong(matrices, buffer, 4, 0.01f, 0, 0.1f, 0.9f, 0.1f, 0.6f, 0, 0, 0, 0, 64, 0, this.segments);
+		ShapeRenderer.renderPrismAlong(matrices, buffer, 4, 0.02f, 0, 0.1f, 0.9f, 0.1f, 0.6f, 0, 0, 0, 0, 64, 0, this.segments);
+		ShapeRenderer.renderPrismAlong(matrices, buffer, 4, 0.04f, 0, 0.1f, 0.9f, 0.1f, 0.6f, 0, 0, 0, 0, 64, 0, this.segments);
 
 //		drawJaggedLine(matrices, buffer, new Random(entity.getWorld().getTime()), 15, 4, 0.3f, 0.01f, 0.4f, 0.5f, 0.7f, 0.5f, 0, 0, 0, x, y, 3);
 //
 //		drawJaggedLine(matrices, buffer, new Random(entity.getWorld().getTime()), 15, 4, 0.3f, 0.01f, 0.4f, 0.5f, 0.7f, 0.5f, 0, 0, 0, 0, 0, 3);
+
+		random.setSeed(52);
 
 		float[] fs = new float[8];
 		float[] gs = new float[8];
@@ -150,11 +171,11 @@ Random random = new Random(42);
 
 					float r = 0.04F + (float)l * 0.08F;
 
-			ShapeRenderer.renderPrismAlong(matrices, buffer, 5, r, 0, cr, cg, cb, 0.35f, 0, 0, 0, 0, 0, -3);
-			ShapeRenderer.renderPrismAlong(matrices, buffer, 5, r, 0, cr, cg, cb, 0.35f, 0, 0, 0, 3, 0, -3);
-			ShapeRenderer.renderPrismAlong(matrices, buffer, 5, r, 0, cr, cg, cb, 0.35f, 0, 0, 0, 0, 3, -3);
-			ShapeRenderer.renderPrismAlong(matrices, buffer, 5, r, 0, cr, cg, cb, 0.35f, 0, 0, 0, -3, 0, -3);
-			ShapeRenderer.renderPrismAlong(matrices, buffer, 5, r, 0, cr, cg, cb, 0.35f, 0, 0, 0, 0, -3, -3);
+			ShapeRenderer.renderPrismAlong(matrices, buffer, 5, r, 0, cr, cg, cb, 0.35f, 0, 0, 0, 0, 0, -3, ShapeRenderer.NO_OFFSET);
+			ShapeRenderer.renderPrismAlong(matrices, buffer, 5, r, 0, cr, cg, cb, 0.35f, 0, 0, 0, 3, 0, -3, ShapeRenderer.NO_OFFSET);
+			ShapeRenderer.renderPrismAlong(matrices, buffer, 5, r, 0, cr, cg, cb, 0.35f, 0, 0, 0, 0, 3, -3, ShapeRenderer.NO_OFFSET);
+			ShapeRenderer.renderPrismAlong(matrices, buffer, 5, r, 0, cr, cg, cb, 0.35f, 0, 0, 0, -3, 0, -3, ShapeRenderer.NO_OFFSET);
+			ShapeRenderer.renderPrismAlong(matrices, buffer, 5, r, 0, cr, cg, cb, 0.35f, 0, 0, 0, 0, -3, -3, ShapeRenderer.NO_OFFSET);
 //				}
 //			}
 		}
