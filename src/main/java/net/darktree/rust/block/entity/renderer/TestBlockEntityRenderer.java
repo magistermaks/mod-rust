@@ -4,6 +4,7 @@ import net.darktree.lumberjack.ModelHelper;
 import net.darktree.lumberjack.ModelRenderer;
 import net.darktree.lumberjack.ShapeRenderer;
 import net.darktree.rust.block.entity.TestBlockEntity;
+import net.darktree.rust.render.ArcRenderer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -27,55 +28,6 @@ public class TestBlockEntityRenderer implements BlockEntityRenderer<TestBlockEnt
 	ShapeRenderer.Segment[] segments = new ShapeRenderer.Segment[64];
 	long timec = -1;
 
-	public void drawAnimatedArcLine(MatrixStack matrices, VertexConsumer buffer, long tick, float delta, float upward, float x1, float y1, float z1, float x2, float y2, float z2) {
-		upward *= (float) Math.sin((tick * 0.1f + delta * 0.1f) % (Math.PI / 2));
-
-		drawArcLine(matrices, buffer, tick, 3, 0.005f, upward, x1, y1, z1, x2, y2, z2);
-	}
-
-	public void drawArcLine(MatrixStack matrices, VertexConsumer buffer, long seed, int depth, float separation, float upward, float x1, float y1, float z1, float x2, float y2, float z2) {
-		Random random = new Random();
-
-		int segments = 20;
-		int sides = 4;
-		float jaggedness = 0.2f;
-		float radius = 0.002f;
-		float r = 0.4f, g = 0.5f, b = 0.75f, a = 0.5f;
-
-		for(int i = 0; i < depth; i ++) {
-			random.setSeed(seed);
-			drawJaggedLine(matrices, buffer, random, segments, sides, jaggedness, upward, radius, r, g, b, a, x1, y1, z1, x2, y2, z2);
-			radius += separation;
-		}
-	}
-
-	public void drawJaggedLine(MatrixStack matrices, VertexConsumer buffer, Random random, int segments, int count, float jaggedness, float upward, float radius, float r, float g, float b, float a, float x1, float y1, float z1, float x2, float y2, float z2) {
-		float sx = (x2 - x1) / segments;
-		float sy = (y2 - y1) / segments;
-		float sz = (z2 - z1) / segments;
-
-		float fx = x1, fy = y1, fz = z1;
-		float tx, ty, tz;
-
-		float step = (float) Math.PI / segments;
-
-		for(int i = 1; i < segments; i ++) {
-			float offset = (float) Math.sin(step * i) * upward;
-
-			tx = x1 + sx * i + (random.nextFloat() - 0.5f) * jaggedness;
-			ty = y1 + sy * i + (random.nextFloat() - 0.5f) * jaggedness + offset;
-			tz = z1 + sz * i + (random.nextFloat() - 0.5f) * jaggedness;
-
-			ShapeRenderer.renderPrismAlong(matrices, buffer, count, radius, 0, r, g, b, a, fx, fy, fz, tx, ty, tz, ShapeRenderer.NO_OFFSET);
-
-			fx = tx;
-			fy = ty;
-			fz = tz;
-		}
-
-		ShapeRenderer.renderPrismAlong(matrices, buffer, count, radius, 0, r, g, b, a, fx, fy, fz, x2, y2, z2, ShapeRenderer.NO_OFFSET);
-	}
-
 	@Override
 	public void render(TestBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		matrices.push();
@@ -95,10 +47,14 @@ Random random = new Random(42);
 
 		long time = entity.getWorld().getTime();
 
+		ArcRenderer.renderNoise(matrices, buffer, time + 7, 8, 0.4f, 0, 0, 3);
+
 //		ShapeRenderer.renderPrismAlong(matrices, buffer, 6, r, 0, cr, cg, cb, 0.35f, 0, 0, 0, x, y, 3);
 
-		drawAnimatedArcLine(matrices, buffer, time + 32, tickDelta, 0.65f, 0, 0, 0, x, y, 3);
-		drawAnimatedArcLine(matrices, buffer, time + 71, tickDelta, 0.65f, 0, 0, 0, 0, 0, 3);
+		ArcRenderer.renderArc(matrices, buffer, time + 90, tickDelta, 0, 6, 0, x, 6, y);
+		ArcRenderer.renderArc(matrices, buffer, time + 32, tickDelta, 0, 6, 0, -x, 6, -y);
+
+		ArcRenderer.renderArc(matrices, buffer, time + 71, tickDelta, 0, 0, 0, 0, 0, 3);
 
 		if(time != this.timec) {
 			this.timec = time;

@@ -1,5 +1,7 @@
 package net.darktree.lumberjack;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.option.GraphicsMode;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.model.BakedQuad;
@@ -25,6 +27,10 @@ public class RenderHelper {
 			float brightness = world.getBrightness(bakedQuad.getFace(), bakedQuad.hasShade());
 			renderFlatQuad(vertexConsumer, matrices.peek(), bakedQuad, brightness, light, overlay);
 		}
+	}
+
+	public static boolean shouldRenderDetails() {
+		return MinecraftClient.getInstance().options.graphicsMode != GraphicsMode.FAST;
 	}
 
 	/**
