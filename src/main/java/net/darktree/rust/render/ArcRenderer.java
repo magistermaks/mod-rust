@@ -22,17 +22,17 @@ public class ArcRenderer {
 	 * Render an arc between two points.
 	 */
 	public static void renderArc(MatrixStack matrices, VertexConsumer buffer, long tick, float delta, float x1, float y1, float z1, float x2, float y2, float z2) {
-		final float r = 0.4f, g = 0.5f, b = 0.75f, t = delta * 0.1f;
+		final float r = 0.4f, g = 0.5f, b = 0.75f, t = delta * 0.1f, s = getDefaultSegmentation();
 
 		float u = upward * MathHelper.sin(((tick + 1) * 0.1f + t) % MathHelper.HALF_PI);
-		renderLayeredArcLine(matrices, buffer, tick + 1, separation, u, x1, y1, z1, x2, y2, z2, r, g, b, 0.5f, 20);
+		renderLayeredArcLine(matrices, buffer, 3, tick + 1, separation, u, s, x1, y1, z1, x2, y2, z2, r, g, b, 0.5f);
 
 		if(RenderHelper.shouldRenderDetails()) {
 			u = upward * MathHelper.sin((tick + t) % MathHelper.HALF_PI);
-			renderLayeredArcLine(matrices, buffer, tick + 2, separation, u, x1, y1, z1, x2, y2, z2, r, g, b, 0.3f, 20);
+			renderLayeredArcLine(matrices, buffer, 3, tick + 2, separation, u, s, x1, y1, z1, x2, y2, z2, r, g, b, 0.3f);
 
 			u = upward * MathHelper.sin((tick + 3 + t) % MathHelper.HALF_PI);
-			renderLayeredArcLine(matrices, buffer, tick + 3, separation, u, x1, y1, z1, x2, y2, z2, r, g, b, 0.1f, 20);
+			renderLayeredArcLine(matrices, buffer, 3, tick + 3, separation, u, s, x1, y1, z1, x2, y2, z2, r, g, b, 0.1f);
 		}
 	}
 
@@ -40,28 +40,27 @@ public class ArcRenderer {
 	 * Render a tesla-coil-like arc source at the given point
 	 */
 	public static void renderNoise(MatrixStack matrices, VertexConsumer buffer, long tick, int count, float radius, float x, float y, float z) {
-		final float r = 0.4f, g = 0.5f, b = 0.75f;
-//		RANDOM.setSeed(tick * 123);
+		final float r = 0.4f, g = 0.5f, b = 0.75f, s = getDefaultSegmentation();
+		final float[] sizes = {0.1f, 0.3f, 0.5f};
 
-		float[] sizes = {0.1f, 0.3f, 0.5f};
-
-		// make the random values not continues
+		// we need more randomness!
 		RANDOM.setSeed(tick);
 		Random random = new Random(RANDOM.nextLong());
 
+		// based on: https://math.stackexchange.com/a/1585996
 		for(int i = 0; i < count; i++) {
 			double tx = random.nextGaussian();
 			double ty = random.nextGaussian();
 			double tz = random.nextGaussian();
 
-			double scale = 1.0 / Math.sqrt(x*x + y*y + z*z);
+			double scale = 1.0 / Math.sqrt(tx*tx + ty*ty + tz*tz);
 			double length = radius * (random.nextFloat() + 1);
 
 			tx = x + tx * scale * length;
 			ty = x + ty * scale * length;
 			tz = z + tz * scale * length;
 
-			renderLayeredArcLine(matrices, buffer, tick + i, separation, 0, x, y, z, (float) tx, (float) ty, (float) tz, r * 1.34f, g, b, sizes[i % 3], 4);
+			renderLayeredArcLine(matrices, buffer, 3, tick + i, separation, 0, s, x, y, z, (float) tx, (float) ty, (float) tz, r * 1.34f, g, b, sizes[i % 3]);
 		}
 	}
 
@@ -69,12 +68,15 @@ public class ArcRenderer {
 	 * Render a simple single layered jagged arc-like line between two points.
 	 * For rendering detailed arcs use the {@link ArcRenderer#renderArc} method.
 	 */
-	public static void renderLayeredArcLine(MatrixStack matrices, VertexConsumer buffer, long seed, float separation, float upward, float x1, float y1, float z1, float x2, float y2, float z2, float r, float g, float b, float a, int segments) {
-		/// TODO: 'segments' probably should be based on length
+	public static void renderLayeredArcLine(MatrixStack matrices, VertexConsumer buffer, int depth, long seed, float separation, float upward, float segmentation, float x1, float y1, float z1, float x2, float y2, float z2, float r, float g, float b, float a) {
+		final float dx = x2 - x1;
+		final float dy = y2 - y1;
+		final float dz = z2 - z1;
+		final int segments = (int) (segmentation * MathHelper.sqrt(dx * dx + dy * dy + dz * dz));
 
 		float radius = 0.002f;
 
-		for(int i = 0; i < 3; i ++) {
+		for(int i = 0; i < depth; i ++) {
 			RANDOM.setSeed(seed);
 			renderArcLine(matrices, buffer, RANDOM, segments, 4, 0.2f, upward, radius, true, r, g, b, a, x1, y1, z1, x2, y2, z2);
 			radius += separation;
@@ -96,7 +98,7 @@ public class ArcRenderer {
 		float step = (float) Math.PI / segments;
 
 		for(int i = 1; i < segments; i ++) {
-			float offset = (float) Math.sin(step * i) * upward;
+			float offset = MathHelper.sin(step * i) * upward;
 
 			tx = x1 + sx * i + (random.nextFloat() - 0.5f) * jaggedness;
 			ty = y1 + sy * i + (random.nextFloat() - 0.5f) * jaggedness + offset;
@@ -121,6 +123,13 @@ public class ArcRenderer {
 		}
 
 		ShapeRenderer.renderPrismAlong(matrices, buffer, count, radius, 0, r, g, b, a, fx, fy, fz, x2, y2, z2, ShapeRenderer.NO_OFFSET);
+	}
+
+	/**
+	 * Get the default value of the 'segmentation' parameter
+	 */
+	public static float getDefaultSegmentation() {
+		return RenderHelper.shouldRenderDetails() ? 6.666f : 4.666f;
 	}
 
 }
