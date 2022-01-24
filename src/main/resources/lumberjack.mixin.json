@@ -1,12 +1,11 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "net.darktree.rust.mixin",
+  "package": "net.darktree.lumberjack.mixin",
   "compatibilityLevel": "JAVA_16",
-  "mixins": [
-  ],
   "client": [
-
+    "ParticleAccessor",
+    "ParticleManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

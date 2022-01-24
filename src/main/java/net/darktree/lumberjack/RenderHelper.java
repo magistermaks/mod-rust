@@ -3,10 +3,14 @@ package net.darktree.lumberjack;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GraphicsMode;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Quaternion;
+import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.BlockRenderView;
 
 import java.util.List;
@@ -31,6 +35,10 @@ public class RenderHelper {
 
 	public static boolean shouldRenderDetails() {
 		return MinecraftClient.getInstance().options.graphicsMode != GraphicsMode.FAST;
+	}
+
+	public static VertexConsumerProvider.Immediate getImmediate() {
+		return MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
 	}
 
 	/**

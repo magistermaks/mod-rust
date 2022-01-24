@@ -29,7 +29,8 @@
     ]
   },
   "mixins": [
-    "rust.mixins.json"
+    "rust.mixins.json",
+    "lumberjack.mixin.json"
   ],
 
   "depends": {
