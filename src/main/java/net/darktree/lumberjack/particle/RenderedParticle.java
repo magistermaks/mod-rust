@@ -1,7 +1,6 @@
 package net.darktree.lumberjack.particle;
 
 import net.darktree.lumberjack.RenderHelper;
-import net.darktree.lumberjack.mixin.ParticleAccessor;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleTextureSheet;
 import net.minecraft.client.render.Camera;

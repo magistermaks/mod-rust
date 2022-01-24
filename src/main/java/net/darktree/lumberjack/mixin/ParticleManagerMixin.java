@@ -17,14 +17,10 @@ public class ParticleManagerMixin {
 
 	@Inject(method="loadTextureList", at=@At("HEAD"), cancellable=true)
 	public void loadTextureList(ResourceManager resourceManager, Identifier id, Map<Identifier, List<Identifier>> result, CallbackInfo ci) {
-		List<Identifier> sprites = ParticleHelper.particleSprites.get(id);
+		List<Identifier> sprites = ParticleHelper.getSpritesAndForget(id);
 
 		if(sprites != null) {
 			result.put(id, sprites);
-
-			// don't hoard the RAM
-			ParticleHelper.particleSprites.remove(id);
-
 			ci.cancel();
 		}
 	}

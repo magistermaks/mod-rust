@@ -4,7 +4,6 @@
   "package": "net.darktree.lumberjack.mixin",
   "compatibilityLevel": "JAVA_16",
   "client": [
-    "ParticleAccessor",
     "ParticleManagerMixin"
   ],
   "injectors": {

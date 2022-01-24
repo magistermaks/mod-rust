@@ -23,8 +23,7 @@ public class ElectricParticle extends RenderedParticle {
 
 	@Override
 	public void render(VertexConsumerProvider.Immediate immediate, MatrixStack matrices, float delta) {
-
-		float scale = (float) (this.maxAge - this.age) / (float) this.maxAge;
+		final float scale = (float) (this.maxAge - this.age) / (float) this.maxAge;
 
 		VertexConsumer buffer = immediate.getBuffer(RenderLayer.getLightning());
 		ArcRenderer.renderNoise(matrices, buffer, this.seed + this.age, 8, scale * 0.5f, 0, 0, 0);
