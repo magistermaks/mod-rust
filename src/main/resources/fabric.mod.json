@@ -1,0 +1,46 @@
+{
+	"schemaVersion": 1,
+	"id": "rust",
+	"version": "${version}",
+	"name": "Rust",
+	"description": "Rust Technology Ltd.",
+	"authors": [
+		"magistermaks"
+	],
+	"contact": {
+	},
+	"license": "LGPL",
+	"icon": "assets/rust/icon.png",
+	"environment": "*",
+	"accessWidener" : "rust.accesswidener",
+
+	"entrypoints": {
+		"main": [
+			"net.darktree.rust.Rust"
+		],
+		"client": [
+			"net.darktree.rust.RustClient"
+		],
+		"fabric-datagen": [
+			"net.darktree.rust.RustDataGenerator"
+		]
+	},
+
+	"mixins": [
+		"rust.mixins.json",
+		{
+			"config": "rust.client.mixins.json",
+			"environment": "client"
+		}
+	],
+
+	"depends": {
+		"fabricloader": "*",
+		"minecraft": "1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+
+	"suggests": {
+	}
+}
