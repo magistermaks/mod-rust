@@ -14,23 +14,24 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockRenderView;
 import org.joml.*;
-import org.lwjgl.system.MemoryStack;
 
 import java.lang.Math;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class RenderHelper {
 
-	private static final Color4f TINT = new Color4f(1.0f);
 	private static final Vector3f POSITIVE_Y = new Vector3f(0, 1, 0);
 	private static final Random RANDOM = Random.create();
 	private static final Quaternionf FACING = getDegreesQuaternion(POSITIVE_Y, 180);
 
+	public static float tr, tg, tb, ta;
+
 	public static void setTint(float r, float g, float b, float a) {
-		TINT.set(r, g, b, a);
+		tr = r;
+		tg = g;
+		tb = b;
+		ta = a;
 	}
 
 	public static Quaternionf getDegreesQuaternion(Vector3f vector, float degrees) {
@@ -58,10 +59,10 @@ public class RenderHelper {
 			tmp.z = Float.intBitsToFloat(vertices[vertex + 2]);
 
 			int bytes = vertices[vertex + 3];
-			float r = brightnesses * TINT.r * ((bytes & 0xFF) / 255.0f);
-			float g = brightnesses * TINT.g * (((bytes >> 8) & 0xFF) / 255.0f);
-			float b = brightnesses * TINT.b * (((bytes >> 16) & 0xFF) / 255.0f);
-			float a = TINT.a;
+			float r = brightnesses * tr * ((bytes & 0xFF) / 255.0f);
+			float g = brightnesses * tg * (((bytes >> 8) & 0xFF) / 255.0f);
+			float b = brightnesses * tb * (((bytes >> 16) & 0xFF) / 255.0f);
+			float a = ta;
 
 			float u = Float.intBitsToFloat(vertices[vertex + 4]);
 			float v = Float.intBitsToFloat(vertices[vertex + 5]);

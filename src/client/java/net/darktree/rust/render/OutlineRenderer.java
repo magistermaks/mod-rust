@@ -1,6 +1,7 @@
 package net.darktree.rust.render;
 
 import com.google.common.base.Suppliers;
+import net.darktree.rust.BlockAssembly;
 import net.darktree.rust.RustClient;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -10,6 +11,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.GlfwUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
@@ -19,12 +21,16 @@ import org.joml.Vector3f;
 
 import java.util.function.Supplier;
 
-public class OutlineRenderer implements WorldRenderEvents.Last {
+public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 
 	private static final Vector3f UP = new Vector3f(0, 1, 0);
 	private final MinecraftClient client;
 	private Rotation rotation;
 	private Supplier<BakedModel> supplier;
+	private BlockAssembly assembly;
+
+	private float r, g, b;
+	private boolean hadLast = false;
 
 	public OutlineRenderer() {
 		client = MinecraftClient.getInstance();
@@ -35,17 +41,46 @@ public class OutlineRenderer implements WorldRenderEvents.Last {
 		this.supplier = Suppliers.memoize(() -> client.getBakedModelManager().getModel(model));
 	}
 
-	public void onLast(WorldRenderContext context) {
+	public void setBlockAssembly(BlockAssembly assembly) {
+		this.assembly = assembly;
+	}
+
+	public void afterEntities(WorldRenderContext context) {
 		final HitResult result = client.crosshairTarget;
 
 		while (RustClient.ROTATE_KEY.wasPressed()) {
 			rotation = rotation.next();
 		}
 
+		if (result.getType() == HitResult.Type.MISS) {
+			hadLast = false;
+			return;
+		}
+
 		if (result instanceof BlockHitResult hit && result.getType() == HitResult.Type.BLOCK) {
 			final int offset = context.world().getBlockState(hit.getBlockPos()).isReplaceable() ? 0 : 1;
 			final BlockPos pos = hit.getBlockPos().offset(hit.getSide(), offset);
 			final BakedModel model = supplier.get();
+
+			boolean valid = assembly.isValid(context.world(), pos, rotation.rotation);
+			float wave = (float) (Math.sin(GlfwUtil.getTime() * 2.8f) * 0.5) + 0.5f;
+
+			float r = valid ? 1 : 0.85f;
+			float g = valid ? 1 : 0.33f;
+			float b = valid ? 1 : 0.33f;
+
+			if (hadLast) {
+				this.r = (this.r * 0.91f + r * 0.09f);
+				this.g = (this.g * 0.91f + g * 0.09f);
+				this.b = (this.b * 0.91f + b * 0.09f);
+			} else {
+				this.r = r;
+				this.g = g;
+				this.b = b;
+				hadLast = true;
+			}
+
+			float a = wave * 0.2f + 0.65f;
 
 			if (model != null) {
 				final MatrixStack matrices = context.matrixStack();
@@ -58,7 +93,7 @@ public class OutlineRenderer implements WorldRenderEvents.Last {
 				matrices.translate(pos.getX() + rotation.x, pos.getY(), pos.getZ() + rotation.z);
 				matrices.multiply(RenderHelper.getDegreesQuaternion(UP, rotation.angle));
 
-				RenderHelper.setTint(1, 1, 1, 0.8f);
+				RenderHelper.setTint(this.r, this.g, this.b, a);
 				RenderHelper.renderModel(model, context.world(), pos, buffer, matrices, 0, 42);
 
 				matrices.pop();

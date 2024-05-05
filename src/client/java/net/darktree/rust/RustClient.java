@@ -5,10 +5,17 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.minecraft.block.Block;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.function.BooleanBiFunction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.List;
 
 public class RustClient implements ClientModInitializer {
 
@@ -24,8 +31,12 @@ public class RustClient implements ClientModInitializer {
 			context.addModels(myModel);
 		});
 
+		VoxelShape shape = VoxelShapes.combine(Block.createCuboidShape(0, 0, 0, 16, 16, 16), Block.createCuboidShape(0, 0, -16, 16, 16, 0), BooleanBiFunction.OR);
+		BlockAssembly assembly = new BlockAssembly(List.of(new BlockPos(0, 0, 0), new BlockPos(0, 1, 0), new BlockPos(0, 0, -1)), shape);
+		OUTLINER.setBlockAssembly(assembly);
+
 		KeyBindingHelper.registerKeyBinding(ROTATE_KEY);
-		WorldRenderEvents.LAST.register(OUTLINER);
+		WorldRenderEvents.AFTER_ENTITIES.register(OUTLINER);
 
 		OUTLINER.setBlockModel(myModel);
 	}

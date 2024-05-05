@@ -2,7 +2,6 @@ package net.darktree.rust.mixin.client;
 
 import com.mojang.blaze3d.systems.VertexSorter;
 import net.darktree.rust.render.OutlineRenderLayer;
-import net.darktree.rust.render.RenderHelper;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderPhase;
