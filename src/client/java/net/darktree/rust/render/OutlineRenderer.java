@@ -3,8 +3,13 @@ package net.darktree.rust.render;
 import com.google.common.base.Suppliers;
 import net.darktree.rust.BlockAssembly;
 import net.darktree.rust.RustClient;
+import net.darktree.rust.item.AssemblyItem;
+import net.darktree.rust.network.AssemblyRotationC2SPacket;
+import net.darktree.rust.network.RustNetworking;
+import net.darktree.rust.util.duck.PlayerRotationView;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderLayer;
@@ -13,6 +18,10 @@ import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.GlfwUtil;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.Item;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -46,57 +55,80 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 	}
 
 	public void afterEntities(WorldRenderContext context) {
-		final HitResult result = client.crosshairTarget;
 
-		while (RustClient.ROTATE_KEY.wasPressed()) {
-			rotation = rotation.next();
+		if (client.player == null) {
+			return;
 		}
+
+		final HitResult result = client.crosshairTarget;
+		final Item item = client.player.getStackInHand(client.player.getActiveHand()).getItem();
+		boolean rotationUpdate = false;
 
 		if (result.getType() == HitResult.Type.MISS) {
 			hadLast = false;
 			return;
 		}
 
-		if (result instanceof BlockHitResult hit && result.getType() == HitResult.Type.BLOCK) {
-			final int offset = context.world().getBlockState(hit.getBlockPos()).isReplaceable() ? 0 : 1;
-			final BlockPos pos = hit.getBlockPos().offset(hit.getSide(), offset);
-			final BakedModel model = supplier.get();
+		if (item instanceof AssemblyItem assemblyItem) {
+			BlockAssembly assembly = assemblyItem.getAssembly();
 
-			boolean valid = assembly.isValid(context.world(), pos, rotation.rotation);
-			float wave = (float) (Math.sin(GlfwUtil.getTime() * 2.8f) * 0.5) + 0.5f;
-
-			float r = valid ? 1 : 0.85f;
-			float g = valid ? 1 : 0.33f;
-			float b = valid ? 1 : 0.33f;
-
-			if (hadLast) {
-				this.r = (this.r * 0.91f + r * 0.09f);
-				this.g = (this.g * 0.91f + g * 0.09f);
-				this.b = (this.b * 0.91f + b * 0.09f);
-			} else {
-				this.r = r;
-				this.g = g;
-				this.b = b;
-				hadLast = true;
+			while (RustClient.ROTATE_KEY.wasPressed()) {
+				if (hadLast) {
+					rotation = rotation.next();
+					PlayerRotationView.of(client.player).rust_setAssemblyRotation(rotation.getBlockRotation());
+					rotationUpdate = true;
+				}
 			}
 
-			float a = wave * 0.2f + 0.65f;
+			if (rotationUpdate) {
+				client.player.playSound(SoundEvents.ENTITY_ITEM_FRAME_ROTATE_ITEM, SoundCategory.BLOCKS, 0.9f, 0.8f);
 
-			if (model != null) {
-				final MatrixStack matrices = context.matrixStack();
-				final Camera camera = context.camera();
-				final RenderLayer layer = OutlineRenderLayer.getOutlineLayer(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
-				final VertexConsumer buffer = context.consumers().getBuffer(layer);
+				RustNetworking.ROTATION.send(rotation.getBlockRotation(), buffer -> {
+					ClientSidePacketRegistry.INSTANCE.sendToServer(AssemblyRotationC2SPacket.ID, buffer);
+				});
+			}
 
-				matrices.push();
-				matrices.translate(-camera.getPos().x, -camera.getPos().y, -camera.getPos().z);
-				matrices.translate(pos.getX() + rotation.x, pos.getY(), pos.getZ() + rotation.z);
-				matrices.multiply(RenderHelper.getDegreesQuaternion(UP, rotation.angle));
+			if (result instanceof BlockHitResult hit && result.getType() == HitResult.Type.BLOCK) {
+				final int offset = context.world().getBlockState(hit.getBlockPos()).isReplaceable() ? 0 : 1;
+				final BlockPos pos = hit.getBlockPos().offset(hit.getSide(), offset);
+				final BakedModel model = supplier.get();
 
-				RenderHelper.setTint(this.r, this.g, this.b, a);
-				RenderHelper.renderModel(model, context.world(), pos, buffer, matrices, 0, 42);
+				boolean valid = assembly.isValid(context.world(), pos, rotation.getBlockRotation());
+				float wave = (float) (Math.sin(GlfwUtil.getTime() * 2.8f) * 0.5) + 0.5f;
 
-				matrices.pop();
+				float r = valid ? 1 : 0.85f;
+				float g = valid ? 1 : 0.33f;
+				float b = valid ? 1 : 0.33f;
+
+				if (hadLast) {
+					this.r = (this.r * 0.91f + r * 0.09f);
+					this.g = (this.g * 0.91f + g * 0.09f);
+					this.b = (this.b * 0.91f + b * 0.09f);
+				} else {
+					this.r = r;
+					this.g = g;
+					this.b = b;
+					hadLast = true;
+				}
+
+				float a = wave * 0.2f + 0.65f;
+
+				if (model != null) {
+					final MatrixStack matrices = context.matrixStack();
+					final Camera camera = context.camera();
+					final RenderLayer layer = OutlineRenderLayer.getOutlineLayer(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
+					final VertexConsumer buffer = context.consumers().getBuffer(layer);
+
+					matrices.push();
+					matrices.translate(-camera.getPos().x, -camera.getPos().y, -camera.getPos().z);
+					matrices.translate(pos.getX() + rotation.x, pos.getY(), pos.getZ() + rotation.z);
+					matrices.multiply(RenderHelper.getDegreesQuaternion(UP, rotation.angle));
+
+					RenderHelper.setTint(this.r, this.g, this.b, a);
+					RenderHelper.renderModel(model, context.world(), pos, buffer, matrices, 0, 42);
+
+					matrices.pop();
+				}
 			}
 		}
 	}
