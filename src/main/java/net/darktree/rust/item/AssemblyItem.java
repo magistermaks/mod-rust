@@ -1,6 +1,6 @@
 package net.darktree.rust.item;
 
-import net.darktree.rust.BlockAssembly;
+import net.darktree.rust.assembly.BlockAssembly;
 import net.darktree.rust.util.duck.PlayerRotationView;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.player.PlayerEntity;
@@ -31,8 +31,8 @@ public class AssemblyItem extends Item {
 	public ActionResult useOnBlock(ItemUsageContext context) {
 		BlockRotation rotation = BlockRotation.NONE;
 		PlayerEntity player = context.getPlayer();
-		BlockPos pos = context.getBlockPos().up(); // FIXME
 		World world = context.getWorld();
+		BlockPos pos = BlockAssembly.getPlacementPosition(world, context.getHitResult());
 		ItemStack stack = context.getStack();
 
 		if (player instanceof PlayerRotationView view) {
@@ -44,6 +44,8 @@ public class AssemblyItem extends Item {
 			if (player instanceof ServerPlayerEntity serverPlayer) {
 				Criteria.PLACED_BLOCK.trigger(serverPlayer, context.getBlockPos(), stack);
 			}
+
+			assembly.place(world, pos, rotation);
 
 			BlockSoundGroup group = assembly.getSoundGroup();
 			world.playSound(player, pos, group.getPlaceSound(), SoundCategory.BLOCKS, (group.getVolume() + 1.0f) / 2.0f, group.getPitch() * 0.8f);

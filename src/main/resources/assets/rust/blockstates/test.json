@@ -1,0 +1,5 @@
+{
+	"variants": {
+		"": { "model": "rust:block/dynamic_assembly_model" }
+	}
+}

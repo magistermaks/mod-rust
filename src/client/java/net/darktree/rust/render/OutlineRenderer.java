@@ -1,7 +1,7 @@
 package net.darktree.rust.render;
 
 import com.google.common.base.Suppliers;
-import net.darktree.rust.BlockAssembly;
+import net.darktree.rust.assembly.BlockAssembly;
 import net.darktree.rust.RustClient;
 import net.darktree.rust.item.AssemblyItem;
 import net.darktree.rust.network.AssemblyRotationC2SPacket;
@@ -20,7 +20,6 @@ import net.minecraft.client.util.GlfwUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
@@ -36,7 +35,6 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 	private final MinecraftClient client;
 	private Rotation rotation;
 	private Supplier<BakedModel> supplier;
-	private BlockAssembly assembly;
 
 	private float r, g, b;
 	private boolean hadLast = false;
@@ -48,10 +46,6 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 
 	public void setBlockModel(Identifier model) {
 		this.supplier = Suppliers.memoize(() -> client.getBakedModelManager().getModel(model));
-	}
-
-	public void setBlockAssembly(BlockAssembly assembly) {
-		this.assembly = assembly;
 	}
 
 	public void afterEntities(WorldRenderContext context) {
@@ -89,8 +83,7 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 			}
 
 			if (result instanceof BlockHitResult hit && result.getType() == HitResult.Type.BLOCK) {
-				final int offset = context.world().getBlockState(hit.getBlockPos()).isReplaceable() ? 0 : 1;
-				final BlockPos pos = hit.getBlockPos().offset(hit.getSide(), offset);
+				final BlockPos pos = BlockAssembly.getPlacementPosition(context.world(), hit);
 				final BakedModel model = supplier.get();
 
 				boolean valid = assembly.isValid(context.world(), pos, rotation.getBlockRotation());

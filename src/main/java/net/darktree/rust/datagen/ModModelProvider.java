@@ -20,6 +20,6 @@ public class ModModelProvider extends FabricModelProvider {
 
 	@Override
 	public void generateItemModels(ItemModelGenerator generator) {
-		generator.register(Rust.TESTI, Models.GENERATED);
+		generator.register(Rust.TEST_ITEM, Models.GENERATED);
 	}
 }

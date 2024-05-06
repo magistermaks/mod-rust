@@ -1,13 +1,12 @@
 package net.darktree.rust;
 
 import net.darktree.rust.render.OutlineRenderer;
+import net.darktree.rust.render.model.RustModels;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 public class RustClient implements ClientModInitializer {
@@ -17,19 +16,11 @@ public class RustClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-
-		Identifier myModel = Rust.id("block/test");
-
-		ModelLoadingPlugin.register(context -> {
-			context.addModels(myModel);
-		});
-
-		OUTLINER.setBlockAssembly(Rust.ASSEMBLY);
-
 		KeyBindingHelper.registerKeyBinding(ROTATE_KEY);
 		WorldRenderEvents.AFTER_ENTITIES.register(OUTLINER);
+		OUTLINER.setBlockModel(RustModels.TEST);
 
-		OUTLINER.setBlockModel(myModel);
+		RustModels.init();
 	}
 
 }
