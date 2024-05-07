@@ -62,10 +62,11 @@ public class AssemblyBlock extends Block implements BlockEntityProvider {
 
 				BlockState target = world.getBlockState(pos);
 
-				if (target.getBlock() == Rust.TEST) {
+				if (target.getBlock() == Rust.PART) {
 					world.setBlockState(pos, Blocks.AIR.getDefaultState());
 				}
 			}
 		});
 	}
+
 }

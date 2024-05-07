@@ -64,7 +64,7 @@ public class AssemblyType {
 
 		for (BlockPos pos : config.getBlocks()) {
 			target.set(pos).move(origin);
-			world.setBlockState(target, Rust.TEST.getDefaultState().with(AssemblyBlock.CENTRAL, pos.equals(BlockPos.ORIGIN)));
+			world.setBlockState(target, Rust.PART.getDefaultState().with(AssemblyBlock.CENTRAL, pos.equals(BlockPos.ORIGIN)));
 			BlockUtil.getBlockEntity(world, target, AssemblyBlockEntity.class).orElseThrow().setAssembly(instance, pos);
 		}
 	}

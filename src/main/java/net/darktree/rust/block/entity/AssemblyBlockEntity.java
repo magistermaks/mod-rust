@@ -40,6 +40,10 @@ public class AssemblyBlockEntity extends BlockEntity {
 		return Optional.ofNullable(assembly);
 	}
 
+	public BlockPos getCenter() {
+		return this.pos.add(this.offset);
+	}
+
 	@Override
 	public void writeNbt(NbtCompound nbt) {
 		super.writeNbt(nbt);

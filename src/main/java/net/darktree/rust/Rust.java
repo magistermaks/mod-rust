@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -43,13 +44,13 @@ public class Rust implements ModInitializer {
 			BlockSoundGroup.ANVIL
 	);
 
-	public static final AssemblyBlock TEST = new AssemblyBlock(AbstractBlock.Settings.create().dropsNothing().solid());
+	public static final AssemblyBlock PART = new AssemblyBlock(AbstractBlock.Settings.create().strength(0.5f, 0.5f).pistonBehavior(PistonBehavior.BLOCK).solid());
 	public static final AssemblyItem TEST_ITEM = new AssemblyItem(ITEM_SETTINGS, ASSEMBLY);
-	public static final BlockEntityType<AssemblyBlockEntity> ASSEMBLY_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(AssemblyBlockEntity::new, TEST).build();
+	public static final BlockEntityType<AssemblyBlockEntity> ASSEMBLY_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(AssemblyBlockEntity::new, PART).build();
 
 	@Override
 	public void onInitialize() {
-		Registry.register(Registries.BLOCK, id("test"), TEST);
+		Registry.register(Registries.BLOCK, id("test"), PART);
 		Registry.register(Registries.ITEM, id("test"), TEST_ITEM);
 		Registry.register(Registries.BLOCK_ENTITY_TYPE, id("assembly"), ASSEMBLY_BLOCK_ENTITY);
 		Registry.register(ASSEMBLY_REGISTRY, id("test"), ASSEMBLY);

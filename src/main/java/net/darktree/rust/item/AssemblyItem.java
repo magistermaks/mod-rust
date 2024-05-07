@@ -55,7 +55,7 @@ public class AssemblyItem extends Item {
 				stack.decrement(1);
 			}
 
-			return ActionResult.CONSUME;
+			return ActionResult.SUCCESS;
 		}
 
 		return ActionResult.PASS;
