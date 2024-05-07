@@ -1,7 +1,7 @@
 package net.darktree.rust.render;
 
 import com.google.common.base.Suppliers;
-import net.darktree.rust.assembly.BlockAssembly;
+import net.darktree.rust.assembly.AssemblyType;
 import net.darktree.rust.RustClient;
 import net.darktree.rust.item.AssemblyItem;
 import net.darktree.rust.network.AssemblyRotationC2SPacket;
@@ -64,7 +64,7 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 		}
 
 		if (item instanceof AssemblyItem assemblyItem) {
-			BlockAssembly assembly = assemblyItem.getAssembly();
+			AssemblyType assembly = assemblyItem.getAssembly();
 
 			while (RustClient.ROTATE_KEY.wasPressed()) {
 				if (hadLast) {
@@ -83,7 +83,7 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 			}
 
 			if (result instanceof BlockHitResult hit && result.getType() == HitResult.Type.BLOCK) {
-				final BlockPos pos = BlockAssembly.getPlacementPosition(context.world(), hit);
+				final BlockPos pos = AssemblyType.getPlacementPosition(context.world(), hit);
 				final BakedModel model = supplier.get();
 
 				boolean valid = assembly.isValid(context.world(), pos, rotation.getBlockRotation());

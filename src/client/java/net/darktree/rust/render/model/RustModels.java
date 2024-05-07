@@ -15,12 +15,7 @@ public class RustModels {
 			plugin.addModels(TEST);
 
 			plugin.modifyModelOnLoad().register((original, context) -> {
-				if (context.id().getNamespace().equals(Rust.NAMESPACE)) {
-					Rust.LOGGER.info(context.id().toString());
-				}
-
 				if(context.id().equals(assembly)) {
-					Rust.LOGGER.info("Creating AssemblyModel...");
 					return new AssemblyModel();
 				}
 

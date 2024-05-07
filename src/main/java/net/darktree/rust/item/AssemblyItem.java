@@ -1,6 +1,6 @@
 package net.darktree.rust.item;
 
-import net.darktree.rust.assembly.BlockAssembly;
+import net.darktree.rust.assembly.AssemblyType;
 import net.darktree.rust.util.duck.PlayerRotationView;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,14 +16,14 @@ import net.minecraft.world.event.GameEvent;
 
 public class AssemblyItem extends Item {
 
-	private final BlockAssembly assembly;
+	private final AssemblyType assembly;
 
-	public AssemblyItem(Settings settings, BlockAssembly assembly) {
+	public AssemblyItem(Settings settings, AssemblyType assembly) {
 		super(settings);
 		this.assembly = assembly;
 	}
 
-	public BlockAssembly getAssembly() {
+	public AssemblyType getAssembly() {
 		return assembly;
 	}
 
@@ -32,7 +32,7 @@ public class AssemblyItem extends Item {
 		BlockRotation rotation = BlockRotation.NONE;
 		PlayerEntity player = context.getPlayer();
 		World world = context.getWorld();
-		BlockPos pos = BlockAssembly.getPlacementPosition(world, context.getHitResult());
+		BlockPos pos = AssemblyType.getPlacementPosition(world, context.getHitResult());
 		ItemStack stack = context.getStack();
 
 		if (player instanceof PlayerRotationView view) {
@@ -70,11 +70,6 @@ public class AssemblyItem extends Item {
 //	public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
 //		super.appendTooltip(stack, world, tooltip, context);
 //		this.getBlock().appendTooltip(stack, world, tooltip, context);
-//	}
-
-//	@Override
-//	public boolean canBeNested() {
-//		return !(this.block instanceof ShulkerBoxBlock);
 //	}
 
 //	@Override
