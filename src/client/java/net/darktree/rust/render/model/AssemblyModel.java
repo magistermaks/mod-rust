@@ -1,5 +1,7 @@
 package net.darktree.rust.render.model;
 
+import net.darktree.rust.assembly.AssemblyInstance;
+import net.darktree.rust.assembly.AssemblyType;
 import net.darktree.rust.block.AssemblyBlock;
 import net.darktree.rust.block.entity.AssemblyBlockEntity;
 import net.darktree.rust.util.BlockUtil;
@@ -20,15 +22,33 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockRenderView;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class AssemblyModel implements UnbakedModel, BakedModel, FabricBakedModel {
 
-	EnumMap<BlockRotation, BakedModel> map = new EnumMap<>(BlockRotation.class);
+	private static final Map<AssemblyType, Map<BlockRotation, BakedModel>> TYPES = new IdentityHashMap<>();
+
+	private static Map<BlockRotation, BakedModel> bakeRotationMapFor(Baker baker, UnbakedModel model, Function<SpriteIdentifier, Sprite> textures, Identifier id) {
+		Map<BlockRotation, BakedModel> map = new EnumMap<>(BlockRotation.class);
+
+		map.put(BlockRotation.NONE, model.bake(baker, textures, ModelRotation.X0_Y0, id));
+		map.put(BlockRotation.CLOCKWISE_90, model.bake(baker, textures, ModelRotation.X0_Y90, id));
+		map.put(BlockRotation.CLOCKWISE_180, model.bake(baker, textures, ModelRotation.X0_Y180, id));
+		map.put(BlockRotation.COUNTERCLOCKWISE_90, model.bake(baker, textures, ModelRotation.X0_Y270, id));
+
+		return map;
+	}
+
+	public static void bakeUnderlyingModels(Baker baker, BiFunction<Identifier, SpriteIdentifier, Sprite> loader) {
+		RustModels.ASSEMBLIES.forEach((type, value) -> TYPES.put(type, bakeRotationMapFor(baker, baker.getOrLoadModel(value), id -> loader.apply(value, id), value)));
+	}
+
+	public static BakedModel getModelFor(AssemblyType type, BlockRotation rotation) {
+		return TYPES.get(type).get(rotation);
+	}
 
 	@Override
 	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction face, Random random) {
@@ -57,7 +77,7 @@ public class AssemblyModel implements UnbakedModel, BakedModel, FabricBakedModel
 
 	@Override
 	public Sprite getParticleSprite() {
-		return map.get(BlockRotation.NONE).getParticleSprite();
+		return TYPES.values().stream().findAny().map(map -> map.get(BlockRotation.NONE)).orElseThrow().getParticleSprite();
 	}
 
 	@Override
@@ -72,7 +92,7 @@ public class AssemblyModel implements UnbakedModel, BakedModel, FabricBakedModel
 
 	@Override
 	public Collection<Identifier> getModelDependencies() {
-		return List.of(RustModels.TEST);
+		return RustModels.ASSEMBLIES.values();
 	}
 
 	@Override
@@ -82,14 +102,7 @@ public class AssemblyModel implements UnbakedModel, BakedModel, FabricBakedModel
 
 	@Nullable
 	@Override
-	public BakedModel bake(Baker baker, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId) {
-		UnbakedModel model = baker.getOrLoadModel(RustModels.TEST);
-
-		map.put(BlockRotation.NONE, model.bake(baker, textureGetter, ModelRotation.X0_Y0, modelId));
-		map.put(BlockRotation.CLOCKWISE_90, model.bake(baker, textureGetter, ModelRotation.X0_Y90, modelId));
-		map.put(BlockRotation.CLOCKWISE_180, model.bake(baker, textureGetter, ModelRotation.X0_Y180, modelId));
-		map.put(BlockRotation.COUNTERCLOCKWISE_90, model.bake(baker, textureGetter, ModelRotation.X0_Y270, modelId));
-
+	public BakedModel bake(Baker baker, Function<SpriteIdentifier, Sprite> textures, ModelBakeSettings rotations, Identifier id) {
 		return this;
 	}
 
@@ -101,14 +114,15 @@ public class AssemblyModel implements UnbakedModel, BakedModel, FabricBakedModel
 	@Override
 	public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context) {
 		if (state.get(AssemblyBlock.CENTRAL)) {
-			BlockRotation rotation = BlockUtil.getBlockEntity(blockView, pos, AssemblyBlockEntity.class).map(AssemblyBlockEntity::getRotation).orElse(BlockRotation.NONE);
-			map.get(rotation).emitBlockQuads(blockView, state, pos, randomSupplier, context);
+			BlockUtil.getBlockEntity(blockView, pos, AssemblyBlockEntity.class).flatMap(AssemblyBlockEntity::getAssembly).ifPresent(instance -> {
+				getModelFor(instance.getType(), instance.getRotation()).emitBlockQuads(blockView, state, pos, randomSupplier, context);
+			});
 		}
 	}
 
 	@Override
 	public void emitItemQuads(ItemStack stack, Supplier<Random> randomSupplier, RenderContext context) {
-		map.get(BlockRotation.NONE).emitItemQuads(stack, randomSupplier, context);
+		// items will not use this model
 	}
 
 }

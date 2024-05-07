@@ -2,3 +2,5 @@ accessWidener v2 named
 accessible class net/minecraft/client/render/RenderLayer$MultiPhaseParameters
 accessible class net/minecraft/client/render/RenderPhase$Texture
 accessible method net/minecraft/item/ItemUsageContext getHitResult ()Lnet/minecraft/util/hit/BlockHitResult;
+accessible class net/minecraft/client/render/model/ModelLoader$BakerImpl
+accessible method net/minecraft/client/render/model/ModelLoader$BakerImpl <init> (Lnet/minecraft/client/render/model/ModelLoader;Ljava/util/function/BiFunction;Lnet/minecraft/util/Identifier;)V

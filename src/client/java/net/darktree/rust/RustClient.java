@@ -18,7 +18,6 @@ public class RustClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		KeyBindingHelper.registerKeyBinding(ROTATE_KEY);
 		WorldRenderEvents.AFTER_ENTITIES.register(OUTLINER);
-		OUTLINER.setBlockModel(RustModels.TEST);
 
 		RustModels.init();
 	}

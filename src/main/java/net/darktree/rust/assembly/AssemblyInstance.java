@@ -47,6 +47,10 @@ public class AssemblyInstance {
 		nbt.putInt("z", origin.getZ());
 	}
 
+	public AssemblyType getType() {
+		return type;
+	}
+
 	public VoxelShape getShape(BlockPos offset) {
 		return config.getShape(offset);
 	}

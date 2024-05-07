@@ -1,11 +1,11 @@
 package net.darktree.rust.render;
 
-import com.google.common.base.Suppliers;
 import net.darktree.rust.assembly.AssemblyType;
 import net.darktree.rust.RustClient;
 import net.darktree.rust.item.AssemblyItem;
 import net.darktree.rust.network.AssemblyRotationC2SPacket;
 import net.darktree.rust.network.RustPackets;
+import net.darktree.rust.render.model.AssemblyModel;
 import net.darktree.rust.util.duck.PlayerRotationView;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -21,20 +21,17 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import org.joml.Vector3f;
-
-import java.util.function.Supplier;
 
 public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 
 	private static final Vector3f UP = new Vector3f(0, 1, 0);
 	private final MinecraftClient client;
 	private Rotation rotation;
-	private Supplier<BakedModel> supplier;
 
 	private float r, g, b;
 	private boolean hadLast = false;
@@ -42,10 +39,6 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 	public OutlineRenderer() {
 		client = MinecraftClient.getInstance();
 		rotation = Rotation.NORTH;
-	}
-
-	public void setBlockModel(Identifier model) {
-		this.supplier = Suppliers.memoize(() -> client.getBakedModelManager().getModel(model));
 	}
 
 	public void afterEntities(WorldRenderContext context) {
@@ -84,7 +77,7 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 
 			if (result instanceof BlockHitResult hit && result.getType() == HitResult.Type.BLOCK) {
 				final BlockPos pos = AssemblyType.getPlacementPosition(context.world(), hit);
-				final BakedModel model = supplier.get();
+				final BakedModel model = AssemblyModel.getModelFor(assembly, BlockRotation.NONE);
 
 				boolean valid = assembly.isValid(context.world(), pos, rotation.getBlockRotation());
 				float wave = (float) (Math.sin(GlfwUtil.getTime() * 2.8f) * 0.5) + 0.5f;
