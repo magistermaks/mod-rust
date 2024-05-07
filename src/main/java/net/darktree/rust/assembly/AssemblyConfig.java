@@ -22,12 +22,8 @@ public class AssemblyConfig {
 		return blocks;
 	}
 
-	public VoxelShape getShape() {
-		return shape;
-	}
-
 	public VoxelShape getShape(BlockPos offset) {
-		return getShape().offset(offset.getX(), offset.getY(), offset.getZ());
+		return shape.offset(offset.getX(), offset.getY(), offset.getZ());
 	}
 
 }

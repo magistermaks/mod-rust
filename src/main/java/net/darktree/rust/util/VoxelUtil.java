@@ -33,10 +33,18 @@ public class VoxelUtil {
 
 	}
 
+	/**
+	 * Get a new instance of the voxel shape
+	 * builder utility
+	 */
 	public static Builder begin() {
 		return new Builder();
 	}
 
+	/**
+	 * Combine a list of given VoxelShapes into
+	 * a single voxel shapes, the resulting shape is unsimplified
+	 */
 	public static VoxelShape combine(List<VoxelShape> shapes) {
 		return shapes.stream().reduce(VoxelShapes.empty(), (a, b) -> VoxelShapes.combine(a, b, BooleanBiFunction.OR));
 	}

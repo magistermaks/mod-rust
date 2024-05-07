@@ -1,10 +1,11 @@
 package net.darktree.rust;
 
+import net.darktree.rust.assembly.AssemblyInstance;
 import net.darktree.rust.assembly.AssemblyType;
 import net.darktree.rust.block.AssemblyBlock;
 import net.darktree.rust.block.entity.AssemblyBlockEntity;
 import net.darktree.rust.item.AssemblyItem;
-import net.darktree.rust.network.RustNetworking;
+import net.darktree.rust.network.RustPackets;
 import net.darktree.rust.util.VoxelUtil;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
@@ -27,13 +28,16 @@ import java.util.List;
 
 public class Rust implements ModInitializer {
 
+	// basic setup
 	public static final String NAMESPACE = "rust";
     public static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
 	public static final Item.Settings ITEM_SETTINGS = new Item.Settings();
 
+	// custom registry
 	public static final RegistryKey<Registry<AssemblyType>> ASSEMBLY_REGISTRY_KEY = RegistryKey.ofRegistry(Rust.id("assembly"));
 	public static final Registry<AssemblyType> ASSEMBLY_REGISTRY = FabricRegistryBuilder.createSimple(ASSEMBLY_REGISTRY_KEY).attribute(RegistryAttribute.SYNCED).buildAndRegister();
 
+	// helper for making Identifiers
 	public static Identifier id(String name) {
 		return new Identifier(NAMESPACE, name);
 	}
@@ -41,7 +45,9 @@ public class Rust implements ModInitializer {
 	public static final AssemblyType ASSEMBLY = new AssemblyType(
 			List.of(new BlockPos(0, 0, 0), new BlockPos(0, 1, 0), new BlockPos(0, 0, -1)),
 			VoxelUtil.begin().addCuboid(0, 0, 0, 16, 16, 16).addCuboid(2, 2, -13, 14, 14, 0).addCuboid(0, 16, 0, 16, 32, 16).build(),
-			BlockSoundGroup.ANVIL
+			BlockSoundGroup.ANVIL,
+			AssemblyInstance::new,
+			(tooltips, context) -> {}
 	);
 
 	public static final AssemblyBlock PART = new AssemblyBlock(AbstractBlock.Settings.create().strength(0.5f, 0.5f).pistonBehavior(PistonBehavior.BLOCK).solid());
@@ -55,7 +61,7 @@ public class Rust implements ModInitializer {
 		Registry.register(Registries.BLOCK_ENTITY_TYPE, id("assembly"), ASSEMBLY_BLOCK_ENTITY);
 		Registry.register(ASSEMBLY_REGISTRY, id("test"), ASSEMBLY);
 
-		RustNetworking.init();
+		RustPackets.init();
 	}
 
 }

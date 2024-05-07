@@ -5,7 +5,7 @@ import net.darktree.rust.assembly.AssemblyType;
 import net.darktree.rust.RustClient;
 import net.darktree.rust.item.AssemblyItem;
 import net.darktree.rust.network.AssemblyRotationC2SPacket;
-import net.darktree.rust.network.RustNetworking;
+import net.darktree.rust.network.RustPackets;
 import net.darktree.rust.util.duck.PlayerRotationView;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -77,7 +77,7 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 			if (rotationUpdate) {
 				client.player.playSound(SoundEvents.ENTITY_ITEM_FRAME_ROTATE_ITEM, SoundCategory.BLOCKS, 0.9f, 0.8f);
 
-				RustNetworking.ROTATION.send(rotation.getBlockRotation(), buffer -> {
+				RustPackets.ROTATION.send(rotation.getBlockRotation(), buffer -> {
 					ClientSidePacketRegistry.INSTANCE.sendToServer(AssemblyRotationC2SPacket.ID, buffer);
 				});
 			}

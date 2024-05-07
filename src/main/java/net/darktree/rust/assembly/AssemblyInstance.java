@@ -2,6 +2,7 @@ package net.darktree.rust.assembly;
 
 import net.darktree.rust.Rust;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Identifier;
@@ -9,9 +10,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 
+import java.util.List;
 import java.util.Objects;
 
 public class AssemblyInstance {
+
+	@FunctionalInterface
+	public interface Factory {
+		AssemblyInstance create(AssemblyType type, BlockRotation rotation, BlockPos origin);
+	}
 
 	private final AssemblyType type;
 	private final AssemblyConfig config;
@@ -33,7 +40,7 @@ public class AssemblyInstance {
 	}
 
 	public void serialize(NbtCompound nbt) {
-		nbt.putString("id", Rust.ASSEMBLY_REGISTRY.getId(type).toString());
+		nbt.putString("id", type.getIdentifier().toString());
 		nbt.putByte("facing", (byte) rotation.ordinal());
 		nbt.putInt("x", origin.getX());
 		nbt.putInt("y", origin.getY());
@@ -48,7 +55,7 @@ public class AssemblyInstance {
 		return rotation;
 	}
 
-	public void onBreak(World world) {
+	public void onRemoved(World world) {
 
 	}
 
@@ -59,4 +66,9 @@ public class AssemblyInstance {
 	public BlockPos getOrigin() {
 		return origin;
 	}
+
+	public void appendDrops(List<ItemStack> stacks) {
+		stacks.add(new ItemStack(Rust.TEST_ITEM));
+	}
+
 }
