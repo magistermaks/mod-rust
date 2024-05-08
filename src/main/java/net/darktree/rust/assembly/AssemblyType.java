@@ -7,7 +7,6 @@ import net.darktree.rust.util.BlockUtil;
 import net.darktree.rust.util.ContainerUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.item.ItemStack;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
@@ -20,7 +19,6 @@ import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public final class AssemblyType {
 

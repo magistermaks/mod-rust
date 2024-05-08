@@ -1,6 +1,7 @@
 package net.darktree.rust.block;
 
 import net.darktree.rust.Rust;
+import net.darktree.rust.assembly.AssemblyInstance;
 import net.darktree.rust.block.entity.AssemblyBlockEntity;
 import net.darktree.rust.util.BlockUtil;
 import net.minecraft.block.*;
@@ -17,6 +18,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Optional;
 
 public class AssemblyBlock extends Block implements BlockEntityProvider {
 
@@ -25,6 +27,10 @@ public class AssemblyBlock extends Block implements BlockEntityProvider {
 	public AssemblyBlock(Settings settings) {
 		super(settings);
 		super.setDefaultState(getDefaultState().with(CENTRAL, false));
+	}
+
+	public Optional<AssemblyInstance> getAssembly(BlockView world, BlockPos pos) {
+		return BlockUtil.getBlockEntity(world, pos, AssemblyBlockEntity.class).flatMap(AssemblyBlockEntity::getAssembly);
 	}
 
 	@Override
@@ -55,7 +61,7 @@ public class AssemblyBlock extends Block implements BlockEntityProvider {
 
 	@Override
 	public void onStateReplaced(BlockState state, World world, BlockPos origin, BlockState newState, boolean moved) {
-		BlockUtil.getBlockEntity(world, origin, AssemblyBlockEntity.class).flatMap(AssemblyBlockEntity::getAssembly).ifPresent(instance -> {
+		getAssembly(world, origin).ifPresent(instance -> {
 			BlockPos.Mutable pos = new BlockPos.Mutable();
 			instance.onRemoved(world);
 
@@ -85,6 +91,19 @@ public class AssemblyBlock extends Block implements BlockEntityProvider {
 		}
 
 		return stacks;
+	}
+
+	@Override
+	public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+		ItemStack stack = ItemStack.EMPTY;
+
+		Optional<AssemblyInstance> instance = getAssembly(world, pos);
+
+		if (instance.isPresent()) {
+			stack = instance.get().asItem();
+		}
+
+		return stack;
 	}
 
 }

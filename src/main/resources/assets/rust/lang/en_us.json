@@ -1,4 +1,5 @@
 {
 	"block.rust.test": "Uga Buga!",
-	"key.rust.rotate": "Rotate Multipart Structure"
+	"key.rust.rotate": "Rotate Multipart Structure",
+	"subtitles.rust.rotate": "Block Rotated"
 }

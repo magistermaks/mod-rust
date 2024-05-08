@@ -22,14 +22,26 @@ public class OutlineRenderLayer {
 		return RenderLayer.of("rust:outline_translucent", VertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL, VertexFormat.DrawMode.QUADS, 256, false, true, multiPhaseParameters);
 	});
 
+	/**
+	 * Check if a given render layers name belongs to the
+	 * reversed outline layer
+	 */
 	public static boolean isOutlineLayer(String name) {
 		return LAYER_NAME.equals(name);
 	}
 
+	/**
+	 * Returns the reversed distance vertex sorter, it sorts vertices
+	 * so that vertices closed to the camera get drawn first
+	 */
 	public static VertexSorter getInvertedVertexSorter() {
 		return INVERTED_VERTEX_SORTER;
 	}
 
+	/**
+	 * The custom render layer is needed to
+	 * implement (with a mixin) a reversed vertex sorting
+	 */
 	public static RenderLayer getOutlineLayer(Identifier texture) {
 		return OUTLINE_TRANSLUCENT.apply(texture);
 	}

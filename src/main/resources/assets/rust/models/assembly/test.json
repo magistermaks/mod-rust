@@ -1,6 +1,7 @@
 {
 	"credit": "Made with Blockbench by magistermaks",
 	"parent": "block",
+	"ambientocclusion": true,
 	"textures": {
 		"0": "block/tuff",
 		"1": "block/oak_log",

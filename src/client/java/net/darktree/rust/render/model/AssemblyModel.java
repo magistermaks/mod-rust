@@ -1,6 +1,5 @@
 package net.darktree.rust.render.model;
 
-import net.darktree.rust.assembly.AssemblyInstance;
 import net.darktree.rust.assembly.AssemblyType;
 import net.darktree.rust.block.AssemblyBlock;
 import net.darktree.rust.block.entity.AssemblyBlockEntity;

@@ -1,7 +1,8 @@
 package net.darktree.rust.render;
 
-import net.darktree.rust.assembly.AssemblyType;
+import net.darktree.rust.Rust;
 import net.darktree.rust.RustClient;
+import net.darktree.rust.assembly.AssemblyType;
 import net.darktree.rust.item.AssemblyItem;
 import net.darktree.rust.network.AssemblyRotationC2SPacket;
 import net.darktree.rust.network.RustPackets;
@@ -20,19 +21,20 @@ import net.minecraft.client.util.GlfwUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import org.joml.Vector3f;
 
 public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 
 	private static final Vector3f UP = new Vector3f(0, 1, 0);
+
 	private final MinecraftClient client;
 	private Rotation rotation;
-
+	private final Random random = Random.createLocal();
 	private float r, g, b;
 	private boolean hadLast = false;
 
@@ -68,7 +70,7 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 			}
 
 			if (rotationUpdate) {
-				client.player.playSound(SoundEvents.ENTITY_ITEM_FRAME_ROTATE_ITEM, SoundCategory.BLOCKS, 0.9f, 0.8f);
+				client.player.playSound(Rust.ROTATE_SOUND_EVENT, SoundCategory.BLOCKS, 0.9f + random.nextFloat() * 0.2f, 0.7f + random.nextFloat() * 0.2f);
 
 				RustPackets.ROTATION.send(rotation.getBlockRotation(), buffer -> {
 					ClientSidePacketRegistry.INSTANCE.sendToServer(AssemblyRotationC2SPacket.ID, buffer);

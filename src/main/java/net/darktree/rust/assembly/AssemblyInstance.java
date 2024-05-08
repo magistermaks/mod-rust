@@ -72,7 +72,11 @@ public class AssemblyInstance {
 	}
 
 	public void appendDrops(List<ItemStack> stacks) {
-		stacks.add(new ItemStack(Rust.TEST_ITEM));
+		stacks.add(asItem());
+	}
+
+	public ItemStack asItem() {
+		return new ItemStack(Rust.TEST_ITEM);
 	}
 
 }

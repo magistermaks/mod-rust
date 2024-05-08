@@ -1,0 +1,12 @@
+{
+	"rotate": {
+		"subtitle": "subtitles.rust.rotate",
+		"sounds": [
+			"entity/itemframe/rotate_item1",
+			"entity/itemframe/rotate_item2",
+			"entity/itemframe/rotate_item3",
+			"entity/itemframe/rotate_item4"
+		]
+	}
+}
+

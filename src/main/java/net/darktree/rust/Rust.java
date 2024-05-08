@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.item.Item;
@@ -19,6 +20,8 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.slf4j.Logger;
@@ -37,6 +40,10 @@ public class Rust implements ModInitializer {
 	public static final RegistryKey<Registry<AssemblyType>> ASSEMBLY_REGISTRY_KEY = RegistryKey.ofRegistry(Rust.id("assembly"));
 	public static final Registry<AssemblyType> ASSEMBLY_REGISTRY = FabricRegistryBuilder.createSimple(ASSEMBLY_REGISTRY_KEY).attribute(RegistryAttribute.SYNCED).buildAndRegister();
 
+	// sounds
+	public static final Identifier ROTATE_SOUND_ID = Rust.id("rotate");
+	public static SoundEvent ROTATE_SOUND_EVENT = SoundEvent.of(ROTATE_SOUND_ID);
+
 	// helper for making Identifiers
 	public static Identifier id(String name) {
 		return new Identifier(NAMESPACE, name);
@@ -50,7 +57,7 @@ public class Rust implements ModInitializer {
 			(tooltips, context) -> {}
 	);
 
-	public static final AssemblyBlock PART = new AssemblyBlock(AbstractBlock.Settings.create().strength(0.5f, 0.5f).pistonBehavior(PistonBehavior.BLOCK).solid());
+	public static final AssemblyBlock PART = new AssemblyBlock(AbstractBlock.Settings.create().allowsSpawning(Blocks::never).strength(0.5f, 0.5f).mapColor(DyeColor.LIGHT_GRAY).pistonBehavior(PistonBehavior.BLOCK).solid());
 	public static final AssemblyItem TEST_ITEM = new AssemblyItem(ITEM_SETTINGS, ASSEMBLY);
 	public static final BlockEntityType<AssemblyBlockEntity> ASSEMBLY_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(AssemblyBlockEntity::new, PART).build();
 
@@ -60,6 +67,7 @@ public class Rust implements ModInitializer {
 		Registry.register(Registries.ITEM, id("test"), TEST_ITEM);
 		Registry.register(Registries.BLOCK_ENTITY_TYPE, id("assembly"), ASSEMBLY_BLOCK_ENTITY);
 		Registry.register(ASSEMBLY_REGISTRY, id("test"), ASSEMBLY);
+		Registry.register(Registries.SOUND_EVENT, ROTATE_SOUND_ID, ROTATE_SOUND_EVENT);
 
 		RustPackets.init();
 	}
