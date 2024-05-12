@@ -1,6 +1,7 @@
 package net.darktree.rust.block;
 
 import net.darktree.rust.Rust;
+import net.darktree.rust.assembly.AssemblyConfig;
 import net.darktree.rust.assembly.AssemblyInstance;
 import net.darktree.rust.block.entity.AssemblyBlockEntity;
 import net.darktree.rust.util.BlockUtil;
@@ -65,8 +66,8 @@ public class AssemblyBlock extends Block implements BlockEntityProvider {
 			BlockPos.Mutable pos = new BlockPos.Mutable();
 			instance.onRemoved(world);
 
-			for (BlockPos offset : instance.getConfig().getBlocks()) {
-				pos.set(offset).move(instance.getOrigin());
+			for (AssemblyConfig.BlockPair pair : instance.getConfig().getBlocks()) {
+				pos.set(pair.offset()).move(instance.getOrigin());
 
 				BlockState target = world.getBlockState(pos);
 

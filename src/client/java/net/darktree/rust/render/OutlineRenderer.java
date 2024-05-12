@@ -79,7 +79,7 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 
 			if (result instanceof BlockHitResult hit && result.getType() == HitResult.Type.BLOCK) {
 				final BlockPos pos = AssemblyType.getPlacementPosition(context.world(), hit);
-				final BakedModel model = AssemblyModel.getModelFor(assembly, BlockRotation.NONE);
+				final BakedModel model = AssemblyModel.getModelFor(assembly, BlockRotation.NONE, null);
 
 				boolean valid = assembly.isValid(context.world(), pos, rotation.getBlockRotation());
 				float wave = (float) (Math.sin(GlfwUtil.getTime() * 2.8f) * 0.5) + 0.5f;
