@@ -1,6 +1,6 @@
 {
 	"credit": "Made with Blockbench by magistermaks",
-	"parent": "block",
+	"parent": "block/block",
 	"ambientocclusion": true,
 	"textures": {
 		"0": "block/tuff",

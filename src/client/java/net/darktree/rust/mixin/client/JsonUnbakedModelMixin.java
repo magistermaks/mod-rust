@@ -9,8 +9,6 @@ import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,8 +19,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static net.minecraft.client.render.model.json.JsonUnbakedModel.PARTICLE_KEY;
-
+/**
+ * We use this mixin to split select baked models into parts
+ * by the model elements depending on the placement of those parts in the model.
+ * Model elements will be assigned to a block in which they lay, and returned
+ * as a hash map. (so a part of a model that is one block above the main block will
+ * be returned in the hashmap with a key BlockPos{0, 1, 0})
+ */
 @Mixin(JsonUnbakedModel.class)
 public abstract class JsonUnbakedModelMixin implements UnbakedMultiblockView {
 
@@ -38,7 +41,8 @@ public abstract class JsonUnbakedModelMixin implements UnbakedMultiblockView {
 	@Shadow
 	public abstract List<ModelElement> getElements();
 
-	@Shadow public abstract BakedModel bake(Baker baker, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId);
+	@Shadow
+	public abstract BakedModel bake(Baker baker, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId);
 
 	@Unique
 	ModelElement copyElementForOffset(ModelElement element, BlockPos offset) {
@@ -51,12 +55,8 @@ public abstract class JsonUnbakedModelMixin implements UnbakedMultiblockView {
 		ModelElement copy = new ModelElement(new Vector3f(element.from), new Vector3f(element.to), element.faces, element.rotation, element.shade);
 
 		// adjust position
-		copy.from.x -= offset.getX() * 16;
-		copy.from.y -= offset.getY() * 16;
-		copy.from.z -= offset.getZ() * 16;
-		copy.to.x -= offset.getX() * 16;
-		copy.to.y -= offset.getY() * 16;
-		copy.to.z -= offset.getZ() * 16;
+		copy.from.sub(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16);
+		copy.to.sub(offset.getX() * 16, offset.getY() * 16, offset.getZ() * 16);
 
 		return copy;
 	}
@@ -64,7 +64,7 @@ public abstract class JsonUnbakedModelMixin implements UnbakedMultiblockView {
 	@Override
 	public Map<BlockPos, BakedModel> rust_bakeModelMap(Baker baker, Function<SpriteIdentifier, Sprite> textures, ModelBakeSettings settings, Identifier id) {
 		JsonUnbakedModel self = (JsonUnbakedModel) (Object) this;;
-		Sprite sprite = textures.apply(this.resolveSprite(PARTICLE_KEY));
+		Sprite sprite = textures.apply(this.resolveSprite(JsonUnbakedModel.PARTICLE_KEY));
 
 		LazyHashMap<BlockPos, BasicBakedModel.Builder> builders = new LazyHashMap<>(key -> {
 			return new BasicBakedModel.Builder(self, this.compileOverrides(baker, parent), true).setParticle(sprite);

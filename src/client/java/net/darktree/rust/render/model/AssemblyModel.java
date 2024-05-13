@@ -1,5 +1,6 @@
 package net.darktree.rust.render.model;
 
+import net.darktree.rust.Rust;
 import net.darktree.rust.assembly.AssemblyType;
 import net.darktree.rust.block.AssemblyBlock;
 import net.darktree.rust.block.entity.AssemblyBlockEntity;
@@ -13,6 +14,7 @@ import net.minecraft.client.render.model.json.JsonUnbakedModel;
 import net.minecraft.client.render.model.json.ModelOverrideList;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRotation;
@@ -30,7 +32,9 @@ import java.util.function.Supplier;
 
 public class AssemblyModel implements UnbakedModel, BakedModel, FabricBakedModel {
 
+	private static final SpriteIdentifier PARTICLE_IDENTIFIER = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, Rust.id("block/assembly_break"));
 	private static final Map<AssemblyType, Map<BlockRotation, Map<BlockPos, BakedModel>>> TYPES = new IdentityHashMap<>();
+	private Sprite sprite;
 
 	private static Map<BlockRotation, Map<BlockPos, BakedModel>> bakeRotationMapFor(Baker baker, UnbakedModel model, Function<SpriteIdentifier, Sprite> textures, Identifier id) {
 		Map<BlockRotation, Map<BlockPos, BakedModel>> map = new EnumMap<>(BlockRotation.class);
@@ -82,7 +86,7 @@ public class AssemblyModel implements UnbakedModel, BakedModel, FabricBakedModel
 
 	@Override
 	public Sprite getParticleSprite() {
-		return TYPES.values().stream().findAny().map(map -> map.get(BlockRotation.NONE).get(null)).orElseThrow().getParticleSprite();
+		return this.sprite;
 	}
 
 	@Override
@@ -108,6 +112,7 @@ public class AssemblyModel implements UnbakedModel, BakedModel, FabricBakedModel
 	@Nullable
 	@Override
 	public BakedModel bake(Baker baker, Function<SpriteIdentifier, Sprite> textures, ModelBakeSettings rotations, Identifier id) {
+		this.sprite = textures.apply(PARTICLE_IDENTIFIER);
 		return this;
 	}
 
