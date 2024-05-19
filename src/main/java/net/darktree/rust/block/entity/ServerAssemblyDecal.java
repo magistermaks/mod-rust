@@ -5,8 +5,9 @@ import net.minecraft.world.World;
 
 public interface ServerAssemblyDecal {
 
-	void tick(World world, AssemblyBlockEntity entity, AssemblyInstance instance);
+	DecalType<?> getType();
 
-	void fetch(AssemblyInstance instance);
+	// TODO
+	void tick(World world, AssemblyBlockEntity entity, AssemblyInstance instance);
 
 }

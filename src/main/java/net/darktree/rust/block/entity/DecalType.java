@@ -2,18 +2,18 @@ package net.darktree.rust.block.entity;
 
 import net.minecraft.util.math.BlockPos;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public final class DecalType <T extends ServerAssemblyDecal> {
 
-	private final Supplier<T> constructor;
+	private final Function<DecalType<T>, T> constructor;
 
-	public DecalType(Supplier<T> supplier) {
-		constructor = supplier;
+	public DecalType(Function<DecalType<T>, T> supplier) {
+		this.constructor = supplier;
 	}
 
 	public T create() {
-		return constructor.get();
+		return constructor.apply(this);
 	}
 
 	public DecalPlacement<T> at(BlockPos pos) {

@@ -1,6 +1,7 @@
 package net.darktree.rust.render.model;
 
 import net.darktree.rust.Rust;
+import net.darktree.rust.RustRegistries;
 import net.darktree.rust.assembly.AssemblyType;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.minecraft.util.Identifier;
@@ -19,7 +20,7 @@ public class RustModels {
 		final Identifier assembly = Rust.id("block/dynamic_assembly_model");
 
 		// create a map of all the assemblies types to their respective models
-		Rust.ASSEMBLY_REGISTRY.getEntrySet().forEach(entry -> {
+		RustRegistries.ASSEMBLY.getEntrySet().forEach(entry -> {
 			Identifier id = entry.getKey().getValue();
 			AssemblyType type = entry.getValue();
 

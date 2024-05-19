@@ -2,6 +2,7 @@ package net.darktree.rust.assembly;
 
 import com.google.common.collect.Maps;
 import net.darktree.rust.Rust;
+import net.darktree.rust.RustRegistries;
 import net.darktree.rust.block.AssemblyBlock;
 import net.darktree.rust.block.entity.*;
 import net.darktree.rust.util.BlockUtil;
@@ -106,7 +107,7 @@ public final class AssemblyType {
 
 	public Identifier getIdentifier() {
 		if (this.identifier == null) {
-			this.identifier = Rust.ASSEMBLY_REGISTRY.getId(this);
+			this.identifier = RustRegistries.ASSEMBLY.getId(this);
 		}
 
 		return this.identifier;

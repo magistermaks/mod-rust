@@ -4,7 +4,7 @@ import net.minecraft.util.math.MathHelper;
 
 public final class DecalPushConstant {
 
-	public final Type type;
+	private final Type type;
 	private double previous;
 	private double current;
 
@@ -29,6 +29,10 @@ public final class DecalPushConstant {
 
 	public double getLinear(double delta) {
 		return MathHelper.lerp(delta, previous, current);
+	}
+
+	public Type getType() {
+		return type;
 	}
 
 	public static class Type {

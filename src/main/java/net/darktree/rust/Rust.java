@@ -39,10 +39,6 @@ public class Rust implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
 	public static final Item.Settings ITEM_SETTINGS = new Item.Settings();
 
-	// custom registry
-	public static final RegistryKey<Registry<AssemblyType>> ASSEMBLY_REGISTRY_KEY = RegistryKey.ofRegistry(Rust.id("assembly"));
-	public static final Registry<AssemblyType> ASSEMBLY_REGISTRY = FabricRegistryBuilder.createSimple(ASSEMBLY_REGISTRY_KEY).attribute(RegistryAttribute.SYNCED).buildAndRegister();
-
 	// sounds
 	public static final Identifier ROTATE_SOUND_ID = Rust.id("rotate");
 	public static SoundEvent ROTATE_SOUND_EVENT = SoundEvent.of(ROTATE_SOUND_ID);
@@ -74,9 +70,12 @@ public class Rust implements ModInitializer {
 		Registry.register(Registries.BLOCK, id("test"), PART);
 		Registry.register(Registries.ITEM, id("test"), TEST_ITEM);
 		Registry.register(Registries.BLOCK_ENTITY_TYPE, id("assembly"), ASSEMBLY_BLOCK_ENTITY);
-		Registry.register(ASSEMBLY_REGISTRY, id("test"), ASSEMBLY);
 		Registry.register(Registries.SOUND_EVENT, ROTATE_SOUND_ID, ROTATE_SOUND_EVENT);
 		Registry.register(Registries.ITEM, id("debug"), DEBUG_ITEM);
+
+		Registry.register(RustRegistries.ASSEMBLY, id("test"), ASSEMBLY);
+		Registry.register(RustRegistries.CONSTANT, id("crank"), CRANK);
+		Registry.register(RustRegistries.CONSTANT, id("speed"), SPEED);
 
 		RustPackets.init();
 	}

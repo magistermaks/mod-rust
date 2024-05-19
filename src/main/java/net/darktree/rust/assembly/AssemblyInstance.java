@@ -1,6 +1,7 @@
 package net.darktree.rust.assembly;
 
 import net.darktree.rust.Rust;
+import net.darktree.rust.RustRegistries;
 import net.darktree.rust.block.AssemblyBlock;
 import net.darktree.rust.block.entity.DecalPushConstant;
 import net.darktree.rust.block.entity.ServerAssemblyDecal;
@@ -55,7 +56,7 @@ public class AssemblyInstance implements AssemblyRenderView, DebugAppender {
 	}
 
 	public AssemblyInstance(NbtCompound nbt) {
-		this.type = Rust.ASSEMBLY_REGISTRY.get(Identifier.tryParse(nbt.getString("id")));
+		this.type = RustRegistries.ASSEMBLY.get(Identifier.tryParse(nbt.getString("id")));
 		this.rotation = BlockRotation.values()[nbt.getByte("facing") % 4];
 		this.config = Objects.requireNonNull(this.type).getConfigFor(this.rotation);
 		this.origin = BlockEntity.posFromNbt(nbt);
@@ -100,14 +101,14 @@ public class AssemblyInstance implements AssemblyRenderView, DebugAppender {
 
 		// decal push constants
 		lines.add(Text.literal("Constants: ").append(constants.values().stream()
-				.map(constant -> Text.literal("rust:type").append("=" + constant.getCurrent()).formatted(Formatting.AQUA))
+				.map(constant -> Text.literal(RustRegistries.CONSTANT.getId(constant.getType()).toString()).append("=" + constant.getCurrent()).formatted(Formatting.AQUA))
 				.reduce((a, b) -> Text.literal("").append(a).append(", ").append(b))
 				.orElseGet(() -> Text.literal("This instance has no constants").formatted(Formatting.GRAY))
 		));
 
 		// decals
 		lines.add(Text.literal("Decals: ").append(decals.getOrDefault(pos, List.of()).stream()
-				.map(constant -> Text.literal("rust:decal").formatted(Formatting.AQUA))
+				.map(decal -> Text.literal(RustRegistries.DECAL.getId(decal.getType()).toString()).formatted(Formatting.AQUA))
 				.reduce((a, b) -> Text.literal("").append(a).append(", ").append(b))
 				.orElseGet(() -> Text.literal("This block has no instance decals").formatted(Formatting.GRAY))
 		));

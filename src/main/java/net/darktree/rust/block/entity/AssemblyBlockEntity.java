@@ -121,16 +121,6 @@ public class AssemblyBlockEntity extends BlockEntity implements DebugAppender {
 
 	public static void worldTick(World world, BlockPos pos, BlockState state, AssemblyBlockEntity entity) {
 		entity.getAssembly().ifPresent(instance -> {
-//			if (world.isClient()) {
-//				instance.clientTick(world, pos, state);
-//
-//				if (entity.decals != null) {
-//					for (ServerAssemblyDecal decal : entity.decals) {
-//						decal.tick(world, entity, instance);
-//					}
-//				}
-//			}
-
 			instance.tick(world, pos, state);
 		});
 	}
@@ -156,7 +146,7 @@ public class AssemblyBlockEntity extends BlockEntity implements DebugAppender {
 
 			if (instance != null) {
 				Text tc = Text.literal(instance.getClass().getSimpleName() + "@" + Integer.toHexString(System.identityHashCode(instance)));
-				it.append(Text.literal(Rust.ASSEMBLY_REGISTRY.getId(instance.getType()).toString()).formatted(Formatting.AQUA));
+				it.append(Text.literal(instance.getType().getIdentifier().toString()).formatted(Formatting.AQUA));
 				it.append(" (").append(tc).append(")");
 			} else {
 				it.append(Text.literal("This assembly has no instance").formatted(Formatting.RED));

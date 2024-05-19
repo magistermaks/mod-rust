@@ -12,7 +12,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import org.lwjgl.glfw.GLFW;
 
 public class RustClient implements ClientModInitializer {
@@ -28,8 +29,9 @@ public class RustClient implements ClientModInitializer {
 		WorldRenderEvents.AFTER_ENTITIES.register(OUTLINER);
 
 		BlockEntityRendererFactories.register(Rust.ASSEMBLY_BLOCK_ENTITY, AssemblyBlockEntityRenderer::new);
-
 		AssemblyDecalManager.register(Rust.ASSEMBLY, CRANK_DECAL.at(0, 0, -1));
+
+		Registry.register(RustRegistries.DECAL, Rust.id("crank"), CRANK_DECAL);
 
 		RustModels.init();
 	}
