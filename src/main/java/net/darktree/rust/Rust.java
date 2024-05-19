@@ -5,8 +5,8 @@ import net.darktree.rust.assembly.AssemblyType;
 import net.darktree.rust.block.AssemblyBlock;
 import net.darktree.rust.block.entity.AssemblyBlockEntity;
 import net.darktree.rust.block.entity.DecalPushConstant;
-import net.darktree.rust.block.entity.DecalType;
 import net.darktree.rust.item.AssemblyItem;
+import net.darktree.rust.item.DebugItem;
 import net.darktree.rust.network.RustPackets;
 import net.darktree.rust.util.VoxelUtil;
 import net.fabricmc.api.ModInitializer;
@@ -64,6 +64,7 @@ public class Rust implements ModInitializer {
 			(tooltips, context) -> {}
 	);
 
+	public static final DebugItem DEBUG_ITEM = new DebugItem(ITEM_SETTINGS);
 	public static final AssemblyBlock PART = new AssemblyBlock(AbstractBlock.Settings.create().allowsSpawning(Blocks::never).ticksRandomly().strength(0.5f, 0.5f).mapColor(DyeColor.LIGHT_GRAY).pistonBehavior(PistonBehavior.BLOCK).solid());
 	public static final AssemblyItem TEST_ITEM = new AssemblyItem(ITEM_SETTINGS, ASSEMBLY);
 	public static final BlockEntityType<AssemblyBlockEntity> ASSEMBLY_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(AssemblyBlockEntity::new, PART).build();
@@ -75,6 +76,7 @@ public class Rust implements ModInitializer {
 		Registry.register(Registries.BLOCK_ENTITY_TYPE, id("assembly"), ASSEMBLY_BLOCK_ENTITY);
 		Registry.register(ASSEMBLY_REGISTRY, id("test"), ASSEMBLY);
 		Registry.register(Registries.SOUND_EVENT, ROTATE_SOUND_ID, ROTATE_SOUND_EVENT);
+		Registry.register(Registries.ITEM, id("debug"), DEBUG_ITEM);
 
 		RustPackets.init();
 	}

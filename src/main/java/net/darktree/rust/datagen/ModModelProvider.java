@@ -21,5 +21,6 @@ public class ModModelProvider extends FabricModelProvider {
 	@Override
 	public void generateItemModels(ItemModelGenerator generator) {
 		generator.register(Rust.TEST_ITEM, Models.GENERATED);
+		generator.register(Rust.DEBUG_ITEM, Models.GENERATED);
 	}
 }

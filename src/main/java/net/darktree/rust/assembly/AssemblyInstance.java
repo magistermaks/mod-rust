@@ -4,12 +4,16 @@ import net.darktree.rust.Rust;
 import net.darktree.rust.block.AssemblyBlock;
 import net.darktree.rust.block.entity.DecalPushConstant;
 import net.darktree.rust.block.entity.ServerAssemblyDecal;
+import net.darktree.rust.util.DebugAppender;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.BlockRotation;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
@@ -24,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class AssemblyInstance implements AssemblyRenderView {
+public class AssemblyInstance implements AssemblyRenderView, DebugAppender {
 
 	@FunctionalInterface
 	public interface Factory {
@@ -81,6 +85,33 @@ public class AssemblyInstance implements AssemblyRenderView {
 		}
 
 		return constant;
+	}
+
+	@Override
+	public void getDebugReport(World world, BlockPos pos, List<Text> lines) {
+
+		// facing
+		lines.add(Text.literal("Rotation: ").append(Text.literal(switch (rotation) {
+			case NONE -> "0 deg";
+			case CLOCKWISE_90 -> "90 deg";
+			case CLOCKWISE_180 -> "180 deg";
+			case COUNTERCLOCKWISE_90 -> "270 deg";
+		}).formatted(Formatting.AQUA)));
+
+		// decal push constants
+		lines.add(Text.literal("Constants: ").append(constants.values().stream()
+				.map(constant -> Text.literal("rust:type").append("=" + constant.getCurrent()).formatted(Formatting.AQUA))
+				.reduce((a, b) -> Text.literal("").append(a).append(", ").append(b))
+				.orElseGet(() -> Text.literal("This instance has no constants").formatted(Formatting.GRAY))
+		));
+
+		// decals
+		lines.add(Text.literal("Decals: ").append(decals.getOrDefault(pos, List.of()).stream()
+				.map(constant -> Text.literal("rust:decal").formatted(Formatting.AQUA))
+				.reduce((a, b) -> Text.literal("").append(a).append(", ").append(b))
+				.orElseGet(() -> Text.literal("This block has no instance decals").formatted(Formatting.GRAY))
+		));
+
 	}
 
 	public AssemblyType getType() {
