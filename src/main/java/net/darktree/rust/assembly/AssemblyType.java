@@ -63,8 +63,8 @@ public final class AssemblyType {
 			return false;
 		}
 
-		for (BlockPos pos : config.getBlocks()) {
-			target.set(pos).move(origin);
+		for (AssemblyConfig.BlockPair pair : config.getBlocks()) {
+			target.set(pair.offset()).move(origin);
 			if (!isStateValid(world.getBlockState(target))) {
 				return false;
 			}
@@ -78,10 +78,10 @@ public final class AssemblyType {
 		AssemblyConfig config = rotations.get(rotation);
 		AssemblyInstance instance = createInstance(rotation, origin);
 
-		for (BlockPos pos : config.getBlocks()) {
-			target.set(pos).move(origin);
-			world.setBlockState(target, Rust.PART.getDefaultState().with(AssemblyBlock.CENTRAL, pos.equals(BlockPos.ORIGIN)));
-			BlockUtil.getBlockEntity(world, target, AssemblyBlockEntity.class).orElseThrow().setAssembly(instance, pos);
+		for (AssemblyConfig.BlockPair pair : config.getBlocks()) {
+			target.set(pair.offset()).move(origin);
+			world.setBlockState(target, Rust.PART.getDefaultState().with(AssemblyBlock.CENTRAL, pair.offset().equals(BlockPos.ORIGIN)));
+			BlockUtil.getBlockEntity(world, target, AssemblyBlockEntity.class).orElseThrow().setAssembly(instance, pair.offset(), pair.key());
 		}
 
 		return true;

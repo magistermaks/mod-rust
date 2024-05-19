@@ -20,9 +20,11 @@ public class AssemblyBlockEntity extends BlockEntity {
 
 	private static final String ASSEMBLY_KEY = "assembly";
 	private static final String OFFSET_KEY = "offset";
+	private static final String MODEL_KEY = "model";
 
 	private AssemblyInstance assembly;
 	private BlockPos offset;
+	private BlockPos modelOffsetKey;
 
 	public AssemblyBlockEntity(BlockPos pos, BlockState state) {
 		super(Rust.ASSEMBLY_BLOCK_ENTITY, pos, state);
@@ -44,6 +46,10 @@ public class AssemblyBlockEntity extends BlockEntity {
 		return this.pos.add(this.offset);
 	}
 
+	public BlockPos getModelOffsetKey() {
+		return this.modelOffsetKey;
+	}
+
 	@Override
 	public void writeNbt(NbtCompound nbt) {
 		super.writeNbt(nbt);
@@ -56,6 +62,7 @@ public class AssemblyBlockEntity extends BlockEntity {
 		}
 
 		nbt.putLong(OFFSET_KEY, this.offset.asLong());
+		nbt.putLong(MODEL_KEY, this.modelOffsetKey.asLong());
 	}
 
 	@Override
@@ -68,6 +75,7 @@ public class AssemblyBlockEntity extends BlockEntity {
 		}
 
 		this.offset = BlockPos.fromLong(nbt.getLong(OFFSET_KEY));
+		this.modelOffsetKey = BlockPos.fromLong(nbt.getLong(MODEL_KEY));
 	}
 
 	@Override
@@ -80,9 +88,10 @@ public class AssemblyBlockEntity extends BlockEntity {
 		return createNbt();
 	}
 
-	public void setAssembly(AssemblyInstance instance, BlockPos pos) {
+	public void setAssembly(AssemblyInstance instance, BlockPos pos, BlockPos unrotated) {
 		this.assembly = instance;
 		this.offset = pos.multiply(-1);
+		this.modelOffsetKey = unrotated;
 	}
 
 	public VoxelShape getShape() {

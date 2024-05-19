@@ -14,7 +14,7 @@ public class RustModels {
 	public static final Map<AssemblyType, Identifier> ASSEMBLIES = new IdentityHashMap<>();
 
 	public static void init() {
-		Identifier assembly = Rust.id("block/dynamic_assembly_model");
+		final Identifier assembly = Rust.id("block/dynamic_assembly_model");
 
 		// create a map of all the assemblies types to their respective models
 		Rust.ASSEMBLY_REGISTRY.getEntrySet().forEach(entry -> {
