@@ -2,10 +2,14 @@ package net.darktree.rust.render;
 
 import net.darktree.rust.Rust;
 import net.darktree.rust.RustClient;
+import net.darktree.rust.assembly.AssemblyConfig;
+import net.darktree.rust.assembly.AssemblyFallbackRenderView;
 import net.darktree.rust.assembly.AssemblyType;
+import net.darktree.rust.block.entity.ServerAssemblyDecal;
 import net.darktree.rust.item.AssemblyItem;
 import net.darktree.rust.network.AssemblyRotationC2SPacket;
 import net.darktree.rust.network.RustPackets;
+import net.darktree.rust.render.decal.ClientAssemblyDecal;
 import net.darktree.rust.render.model.AssemblyModel;
 import net.darktree.rust.util.duck.PlayerRotationView;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
@@ -28,10 +32,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import org.joml.Vector3f;
 
+import java.util.List;
+import java.util.Map;
+
 public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 
 	private static final Vector3f UP = new Vector3f(0, 1, 0);
 
+	private final AssemblyFallbackRenderView view;
 	private final MinecraftClient client;
 	private Rotation rotation;
 	private final Random random = Random.createLocal();
@@ -41,6 +49,7 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 	public OutlineRenderer() {
 		client = MinecraftClient.getInstance();
 		rotation = Rotation.NORTH;
+		view = new AssemblyFallbackRenderView(() -> this.rotation.getBlockRotation());
 	}
 
 	public void afterEntities(WorldRenderContext context) {
@@ -80,6 +89,8 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 			if (result instanceof BlockHitResult hit && result.getType() == HitResult.Type.BLOCK) {
 				final BlockPos pos = AssemblyType.getPlacementPosition(context.world(), hit);
 				final BakedModel model = AssemblyModel.getModelFor(assembly, BlockRotation.NONE, null);
+				final Map<BlockPos, List<? extends ServerAssemblyDecal>> decals = assembly.getSharedDecalMap();
+				final AssemblyConfig config = assembly.getConfigFor(rotation.getBlockRotation());
 
 				boolean valid = assembly.isValid(context.world(), pos, rotation.getBlockRotation());
 				float wave = (float) (Math.sin(GlfwUtil.getTime() * 2.8f) * 0.5) + 0.5f;
@@ -106,16 +117,44 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 					final Camera camera = context.camera();
 					final RenderLayer layer = OutlineRenderLayer.getOutlineLayer(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
 					final VertexConsumer buffer = context.consumers().getBuffer(layer);
+					final BlockPos.Mutable attachment = new BlockPos.Mutable();
 
 					matrices.push();
 					matrices.translate(-camera.getPos().x, -camera.getPos().y, -camera.getPos().z);
+
+					matrices.push();
 					matrices.translate(pos.getX() + rotation.x, pos.getY(), pos.getZ() + rotation.z);
 					matrices.multiply(RenderHelper.getDegreesQuaternion(UP, rotation.angle));
 
+					// z-fighting fix
+					matrices.translate(0.0005f, 0.0005f, 0.0005f);
+					matrices.scale(0.999f, 0.999f, 0.999f);
+
 					RenderHelper.setTint(this.r, this.g, this.b, a);
 					RenderHelper.renderModel(model, context.world(), pos, buffer, matrices, 0, 42);
+					matrices.pop();
+
+					for (AssemblyConfig.BlockPair pair : config.getBlocks()) {
+						for (ServerAssemblyDecal serverDecal : decals.computeIfAbsent(pair.key(), key -> List.of())) {
+							ClientAssemblyDecal decal = (ClientAssemblyDecal) serverDecal;
+
+							attachment.set(pos);
+							attachment.move(pair.offset());
+
+							matrices.push();
+							matrices.translate(attachment.getX(), attachment.getY(), attachment.getZ());
+
+							// z-fighting fix
+							matrices.translate(0.0005f, 0.0005f, 0.0005f);
+							matrices.scale(0.999f, 0.999f, 0.999f);
+
+							decal.render(context.world(), attachment, view, 0, matrices, buffer, 0, this.r, this.g, this.b, a);
+							matrices.pop();
+						}
+					}
 
 					matrices.pop();
+
 				}
 			}
 		}

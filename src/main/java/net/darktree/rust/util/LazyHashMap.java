@@ -19,14 +19,9 @@ public class LazyHashMap <K, V> extends HashMap<K, V> {
 		return computeIfAbsent((K) key, fallback);
 	}
 
+	@Deprecated
 	public <N> Map<K, N> map(Supplier<Map<K, N>> maps, Function<V, N> mapper) {
-		Map<K, N> map = maps.get();
-
-		for (Map.Entry<K, V> entry : entrySet()) {
-			map.put(entry.getKey(), mapper.apply(entry.getValue()));
-		}
-
-		return map;
+		return ContainerUtil.remap(this, maps, mapper);
 	}
 
 }

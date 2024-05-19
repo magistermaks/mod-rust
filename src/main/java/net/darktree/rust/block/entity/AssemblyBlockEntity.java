@@ -9,11 +9,16 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.WeakReference;
 import java.util.Optional;
 
 public class AssemblyBlockEntity extends BlockEntity {
@@ -22,24 +27,26 @@ public class AssemblyBlockEntity extends BlockEntity {
 	private static final String OFFSET_KEY = "offset";
 	private static final String MODEL_KEY = "model";
 
-	private AssemblyInstance assembly;
+	private AssemblyInstance instance;
+	private WeakReference<AssemblyInstance> assembly;
 	private BlockPos offset;
 	private BlockPos modelOffsetKey;
 
 	public AssemblyBlockEntity(BlockPos pos, BlockState state) {
 		super(Rust.ASSEMBLY_BLOCK_ENTITY, pos, state);
+		assembly = new WeakReference<>(null);
 	}
 
 	public Optional<AssemblyInstance> getAssembly() {
-		if (assembly == null && this.offset != null) {
-			BlockEntity entity = world.getBlockEntity(this.pos.add(this.offset));
+		if (assembly.get() == null && this.offset != null) {
+			BlockEntity entity = world.getBlockEntity(getCenter());
 
 			if (entity instanceof AssemblyBlockEntity assemblyEntity) {
-				assembly = assemblyEntity.assembly;
+				assembly = new WeakReference<>(assemblyEntity.instance);
 			}
 		}
 
-		return Optional.ofNullable(assembly);
+		return Optional.ofNullable(assembly.get());
 	}
 
 	public BlockPos getCenter() {
@@ -57,7 +64,7 @@ public class AssemblyBlockEntity extends BlockEntity {
 		// save the assembly if we are the central block
 		if (getCachedState().get(AssemblyBlock.CENTRAL)) {
 			NbtCompound instanceNbt = new NbtCompound();
-			assembly.serialize(instanceNbt);
+			instance.serialize(instanceNbt);
 			nbt.put(ASSEMBLY_KEY, instanceNbt);
 		}
 
@@ -69,9 +76,9 @@ public class AssemblyBlockEntity extends BlockEntity {
 	public void readNbt(NbtCompound nbt) {
 		super.readNbt(nbt);
 
-		// save the assembly if we are the central block
+		// load the assembly if we are the central block
 		if (getCachedState().get(AssemblyBlock.CENTRAL)) {
-			this.assembly = new AssemblyInstance(nbt.getCompound(ASSEMBLY_KEY));
+			this.instance = new AssemblyInstance(nbt.getCompound(ASSEMBLY_KEY));
 		}
 
 		this.offset = BlockPos.fromLong(nbt.getLong(OFFSET_KEY));
@@ -88,10 +95,11 @@ public class AssemblyBlockEntity extends BlockEntity {
 		return createNbt();
 	}
 
-	public void setAssembly(AssemblyInstance instance, BlockPos pos, BlockPos unrotated) {
-		this.assembly = instance;
+	public void setAssembly(@Nullable AssemblyInstance instance, BlockPos pos, BlockPos unrotated) {
+		this.instance = instance;
 		this.offset = pos.multiply(-1);
 		this.modelOffsetKey = unrotated;
+		this.assembly = new WeakReference<>(instance);
 	}
 
 	public VoxelShape getShape() {
@@ -100,6 +108,26 @@ public class AssemblyBlockEntity extends BlockEntity {
 
 	public BlockRotation getRotation() {
 		return getAssembly().map(AssemblyInstance::getRotation).orElse(BlockRotation.NONE);
+	}
+
+	public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+		getAssembly().ifPresent(instance -> instance.random(world, pos, state, random));
+	}
+
+	public static void worldTick(World world, BlockPos pos, BlockState state, AssemblyBlockEntity entity) {
+		entity.getAssembly().ifPresent(instance -> {
+//			if (world.isClient()) {
+//				instance.clientTick(world, pos, state);
+//
+//				if (entity.decals != null) {
+//					for (ServerAssemblyDecal decal : entity.decals) {
+//						decal.tick(world, entity, instance);
+//					}
+//				}
+//			}
+
+			instance.tick(world, pos, state);
+		});
 	}
 
 }

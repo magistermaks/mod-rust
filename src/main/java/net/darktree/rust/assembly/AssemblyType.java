@@ -1,10 +1,13 @@
 package net.darktree.rust.assembly;
 
+import com.google.common.collect.Maps;
 import net.darktree.rust.Rust;
 import net.darktree.rust.block.AssemblyBlock;
-import net.darktree.rust.block.entity.AssemblyBlockEntity;
+import net.darktree.rust.block.entity.*;
 import net.darktree.rust.util.BlockUtil;
 import net.darktree.rust.util.ContainerUtil;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.sound.BlockSoundGroup;
@@ -17,8 +20,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class AssemblyType {
 
@@ -27,15 +32,19 @@ public final class AssemblyType {
 		void append(List<Text> tooltip, TooltipContext context);
 	}
 
+	private final Set<DecalPushConstant.Type> constants;
 	private final BlockSoundGroup sounds;
 	private final Map<BlockRotation, AssemblyConfig> rotations;
 	private final AssemblyInstance.Factory constructor;
 	private final TooltipSupplier tooltipSupplier;
 
+	// cashes
+	private Map<BlockPos, List<? extends ServerAssemblyDecal>> decals;
 	private Identifier identifier = null;
 	private String translation = null;
 
-	public AssemblyType(List<BlockPos> blocks, VoxelShape shape, BlockSoundGroup sounds, AssemblyInstance.Factory factory, TooltipSupplier tooltipSupplier) {
+	public AssemblyType(Set<DecalPushConstant.Type> constants, List<BlockPos> blocks, VoxelShape shape, BlockSoundGroup sounds, AssemblyInstance.Factory factory, TooltipSupplier tooltipSupplier) {
+		this.constants = constants;
 		this.rotations = ContainerUtil.enumMapOf(BlockRotation.class, rotation -> new AssemblyConfig(blocks, shape, rotation));
 		this.sounds = sounds;
 		this.constructor = factory;
@@ -44,6 +53,12 @@ public final class AssemblyType {
 		if (!blocks.contains(BlockPos.ORIGIN)) {
 			throw new RuntimeException("Origin of a block assembly not contained within the assembly!");
 		}
+	}
+
+	public Map<DecalPushConstant.Type, DecalPushConstant> createConstantMap() {
+		Map<DecalPushConstant.Type, DecalPushConstant> map = new HashMap<>();
+		constants.forEach(constant -> map.put(constant, constant.create()));
+		return map;
 	}
 
 	public static BlockPos getPlacementPosition(World world, BlockHitResult hit) {
@@ -80,8 +95,10 @@ public final class AssemblyType {
 
 		for (AssemblyConfig.BlockPair pair : config.getBlocks()) {
 			target.set(pair.offset()).move(origin);
-			world.setBlockState(target, Rust.PART.getDefaultState().with(AssemblyBlock.CENTRAL, pair.offset().equals(BlockPos.ORIGIN)));
-			BlockUtil.getBlockEntity(world, target, AssemblyBlockEntity.class).orElseThrow().setAssembly(instance, pair.offset(), pair.key());
+			boolean central = pair.offset().equals(BlockPos.ORIGIN);
+
+			world.setBlockState(target, Rust.PART.getDefaultState().with(AssemblyBlock.CENTRAL, central));
+			BlockUtil.getBlockEntity(world, target, AssemblyBlockEntity.class).orElseThrow().setAssembly(central ? instance : null, pair.offset(), pair.key());
 		}
 
 		return true;
@@ -117,6 +134,18 @@ public final class AssemblyType {
 
 	public void appendTooltip(List<Text> tooltip, TooltipContext context) {
 		tooltipSupplier.append(tooltip, context);
+	}
+
+	public Map<BlockPos, List<? extends ServerAssemblyDecal>> createDecalMap() {
+		return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER ? null : ContainerUtil.remap(AssemblyDecalManager.getDecals(this), HashMap::new, list -> list.stream().map(DecalType::create).toList());
+	}
+
+	public Map<BlockPos, List<? extends ServerAssemblyDecal>> getSharedDecalMap() {
+		if (decals == null) {
+			this.decals = createDecalMap();
+		}
+
+		return decals;
 	}
 
 }

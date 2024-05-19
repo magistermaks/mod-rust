@@ -1,7 +1,6 @@
 package net.darktree.rust.assembly;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.datafixers.util.Pair;
 import net.darktree.rust.util.RotationUtil;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;

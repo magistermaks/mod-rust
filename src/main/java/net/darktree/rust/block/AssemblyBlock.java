@@ -7,12 +7,20 @@ import net.darktree.rust.block.entity.AssemblyBlockEntity;
 import net.darktree.rust.util.BlockUtil;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
@@ -21,7 +29,7 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Optional;
 
-public class AssemblyBlock extends Block implements BlockEntityProvider {
+public class AssemblyBlock extends BlockWithEntity {
 
 	public static final BooleanProperty CENTRAL = BooleanProperty.of("central");
 
@@ -107,4 +115,20 @@ public class AssemblyBlock extends Block implements BlockEntityProvider {
 		return stack;
 	}
 
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+		return state.get(CENTRAL) ? checkType(type, Rust.ASSEMBLY_BLOCK_ENTITY, AssemblyBlockEntity::worldTick) : null;
+	}
+
+	@Override
+	public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+		if (state.get(CENTRAL)) BlockUtil.getBlockEntity(world, pos, AssemblyBlockEntity.class).ifPresent(entity -> entity.randomTick(state, world, pos, random));
+	}
+
+	@Override
+	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+		getAssembly(world, pos).ifPresent(instance -> instance.onUse(world, pos, player, hand, hit));
+
+		return ActionResult.SUCCESS;
+	}
 }

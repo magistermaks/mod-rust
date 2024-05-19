@@ -13,6 +13,8 @@ public class RustModels {
 	public static final Identifier BAKER_DUMMY_ID = Rust.id("i_like_freshly_baked_bread");
 	public static final Map<AssemblyType, Identifier> ASSEMBLIES = new IdentityHashMap<>();
 
+	public static final Identifier CRANK = Rust.id("part/crank");
+
 	public static void init() {
 		final Identifier assembly = Rust.id("block/dynamic_assembly_model");
 
@@ -25,6 +27,9 @@ public class RustModels {
 		});
 
 		ModelLoadingPlugin.register(plugin -> {
+
+			plugin.addModels(CRANK);
+
 			plugin.modifyModelOnLoad().register((original, context) -> {
 				if(context.id().equals(assembly)) {
 					return new AssemblyModel();

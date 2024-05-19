@@ -4,6 +4,8 @@ import net.darktree.rust.assembly.AssemblyInstance;
 import net.darktree.rust.assembly.AssemblyType;
 import net.darktree.rust.block.AssemblyBlock;
 import net.darktree.rust.block.entity.AssemblyBlockEntity;
+import net.darktree.rust.block.entity.DecalPushConstant;
+import net.darktree.rust.block.entity.DecalType;
 import net.darktree.rust.item.AssemblyItem;
 import net.darktree.rust.network.RustPackets;
 import net.darktree.rust.util.VoxelUtil;
@@ -28,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
 
 public class Rust implements ModInitializer {
 
@@ -49,7 +52,11 @@ public class Rust implements ModInitializer {
 		return new Identifier(NAMESPACE, name);
 	}
 
+	public static final DecalPushConstant.Type CRANK = DecalPushConstant.Type.of(0);
+	public static final DecalPushConstant.Type SPEED = DecalPushConstant.Type.of(0);
+
 	public static final AssemblyType ASSEMBLY = new AssemblyType(
+			Set.of(CRANK, SPEED),
 			List.of(new BlockPos(0, 0, 0), new BlockPos(0, 1, 0), new BlockPos(0, 0, -1)),
 			VoxelUtil.begin().addCuboid(0, 0, 0, 16, 16, 16).addCuboid(2, 2, -13, 14, 14, 0).addCuboid(0, 16, 0, 16, 32, 16).build(),
 			BlockSoundGroup.ANVIL,
@@ -57,7 +64,7 @@ public class Rust implements ModInitializer {
 			(tooltips, context) -> {}
 	);
 
-	public static final AssemblyBlock PART = new AssemblyBlock(AbstractBlock.Settings.create().allowsSpawning(Blocks::never).strength(0.5f, 0.5f).mapColor(DyeColor.LIGHT_GRAY).pistonBehavior(PistonBehavior.BLOCK).solid());
+	public static final AssemblyBlock PART = new AssemblyBlock(AbstractBlock.Settings.create().allowsSpawning(Blocks::never).ticksRandomly().strength(0.5f, 0.5f).mapColor(DyeColor.LIGHT_GRAY).pistonBehavior(PistonBehavior.BLOCK).solid());
 	public static final AssemblyItem TEST_ITEM = new AssemblyItem(ITEM_SETTINGS, ASSEMBLY);
 	public static final BlockEntityType<AssemblyBlockEntity> ASSEMBLY_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(AssemblyBlockEntity::new, PART).build();
 
