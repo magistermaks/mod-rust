@@ -68,7 +68,7 @@ public class AssemblyBlockEntity extends BlockEntity implements DebugAppender {
 		// save the assembly if we are the central block
 		if (getCachedState().get(AssemblyBlock.CENTRAL)) {
 			NbtCompound instanceNbt = new NbtCompound();
-			instance.serialize(instanceNbt);
+			instance.toNbt(instanceNbt);
 			nbt.put(ASSEMBLY_KEY, instanceNbt);
 		}
 
@@ -82,7 +82,7 @@ public class AssemblyBlockEntity extends BlockEntity implements DebugAppender {
 
 		// load the assembly if we are the central block
 		if (getCachedState().get(AssemblyBlock.CENTRAL)) {
-			this.instance = new AssemblyInstance(nbt.getCompound(ASSEMBLY_KEY));
+			this.instance = AssemblyInstance.deserialize(nbt.getCompound(ASSEMBLY_KEY));
 		}
 
 		this.offset = BlockPos.fromLong(nbt.getLong(OFFSET_KEY));

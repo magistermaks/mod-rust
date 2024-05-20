@@ -28,22 +28,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class AssemblyInstance implements AssemblyRenderView, DebugAppender {
+public abstract class AssemblyInstance implements AssemblyRenderView, DebugAppender {
 
 	@FunctionalInterface
 	public interface Factory {
-		AssemblyInstance create(AssemblyType type, BlockRotation rotation, BlockPos origin);
+		AssemblyInstance create(BlockRotation rotation, BlockPos origin);
 	}
 
-	private double velocity = 0, angle = 0;
+	protected final Map<DecalPushConstant.Type, DecalPushConstant> constants;
+	protected final Map<BlockPos, List<? extends ServerAssemblyDecal>> decals;
 
-	private final Map<DecalPushConstant.Type, DecalPushConstant> constants;
-	private final Map<BlockPos, List<? extends ServerAssemblyDecal>> decals;
-
-	private final AssemblyType type;
-	private final AssemblyConfig config;
-	private final BlockRotation rotation;
-	private final BlockPos origin;
+	protected final AssemblyType type;
+	protected final AssemblyConfig config;
+	protected final BlockRotation rotation;
+	protected final BlockPos origin;
 
 	public AssemblyInstance(AssemblyType type, BlockRotation rotation, BlockPos origin) {
 		this.type = type;
@@ -54,16 +52,21 @@ public class AssemblyInstance implements AssemblyRenderView, DebugAppender {
 		this.decals = type.createDecalMap();
 	}
 
-	public AssemblyInstance(NbtCompound nbt) {
-		this.type = RustRegistries.ASSEMBLY.get(Identifier.tryParse(nbt.getString("id")));
-		this.rotation = BlockRotation.values()[nbt.getByte("facing") % 4];
-		this.config = Objects.requireNonNull(this.type).getConfigFor(this.rotation);
-		this.origin = BlockEntity.posFromNbt(nbt);
-		this.constants = type.createConstantMap();
-		this.decals = type.createDecalMap();
+	public static AssemblyInstance deserialize(NbtCompound nbt) {
+		AssemblyType type = RustRegistries.ASSEMBLY.get(Identifier.tryParse(nbt.getString("id")));
+		BlockRotation rotation = BlockRotation.values()[nbt.getByte("facing") % 4];
+		BlockPos origin = BlockEntity.posFromNbt(nbt);
+
+		AssemblyInstance instance = Objects.requireNonNull(type).createInstance(rotation, origin);
+		instance.fromNbt(nbt);
+		return instance;
 	}
 
-	public void serialize(NbtCompound nbt) {
+	public void fromNbt(NbtCompound nbt) {
+
+	}
+
+	public void toNbt(NbtCompound nbt) {
 		nbt.putString("id", type.getIdentifier().toString());
 		nbt.putByte("facing", (byte) rotation.ordinal());
 		nbt.putInt("x", origin.getX());
@@ -72,19 +75,9 @@ public class AssemblyInstance implements AssemblyRenderView, DebugAppender {
 	}
 
 	@Override
-	public DecalPushConstant getDecalPushConstant(DecalPushConstant.Type type) {
-		if (constants == null) {
-			Rust.LOGGER.warn("Decal push constant was requested before the array was initialized!");
-			return type.getFallback();
-		}
-
+	public final DecalPushConstant getDecalPushConstant(DecalPushConstant.Type type) {
 		DecalPushConstant constant = constants.get(type);
-
-		if (constant == null) {
-			return type.getFallback();
-		}
-
-		return constant;
+		return constant == null ? type.getFallback() : constant;
 	}
 
 	@Override
@@ -114,29 +107,29 @@ public class AssemblyInstance implements AssemblyRenderView, DebugAppender {
 
 	}
 
-	public AssemblyType getType() {
-		return type;
-	}
-
-	public VoxelShape getShape(BlockPos offset) {
-		return config.getShape(offset);
-	}
-
 	@Override
 	public BlockRotation getRotation() {
 		return rotation;
 	}
 
-	public void onRemoved(World world) {
-
+	public final AssemblyType getType() {
+		return type;
 	}
 
-	public AssemblyConfig getConfig() {
+	public final VoxelShape getShape(BlockPos offset) {
+		return config.getShape(offset);
+	}
+
+	public final AssemblyConfig getConfig() {
 		return config;
 	}
 
-	public BlockPos getOrigin() {
+	public final BlockPos getOrigin() {
 		return origin;
+	}
+
+	public void onRemoved(World world) {
+
 	}
 
 	public List<? extends ServerAssemblyDecal> getDecalList(BlockPos pos) {
@@ -152,20 +145,15 @@ public class AssemblyInstance implements AssemblyRenderView, DebugAppender {
 	}
 
 	public void onUse(World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		velocity += (hit.getSide().getDirection() == Direction.AxisDirection.NEGATIVE ? +12 : -12);
+
 	}
 
 	public void tick(World world, BlockPos pos, BlockState state) {
-		velocity = (velocity - Math.sin(angle * 0.01745329)) * (1 - 0.21 / MathHelper.clamp(1 + Math.abs(velocity), 1, 3));
-		angle = angle + velocity * 1.98;
 
-		constants.get(Rust.CRANK).push(angle);
 	}
 
 	public void random(World world, BlockPos pos, BlockState state, Random random) {
-		if (!state.get(AssemblyBlock.CENTRAL)) {
-			Rust.LOGGER.error("randomTick: Instance ticked by external source! This should not have happened!");
-		}
+
 	}
 
 }

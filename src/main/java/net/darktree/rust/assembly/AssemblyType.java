@@ -125,7 +125,7 @@ public final class AssemblyType {
 	}
 
 	public AssemblyInstance createInstance(BlockRotation rotation, BlockPos origin) {
-		return constructor.create(this, rotation, origin);
+		return constructor.create(rotation, origin);
 	}
 
 	public String getTranslationKey() {

@@ -1,7 +1,7 @@
 package net.darktree.rust;
 
-import net.darktree.rust.assembly.AssemblyInstance;
 import net.darktree.rust.assembly.AssemblyType;
+import net.darktree.rust.assembly.ManualPressAssembly;
 import net.darktree.rust.block.AssemblyBlock;
 import net.darktree.rust.block.AssemblyBlockEntity;
 import net.darktree.rust.assembly.decal.DecalPushConstant;
@@ -48,18 +48,18 @@ public class Rust implements ModInitializer {
 	public static final DecalPushConstant.Type CRANK = DecalPushConstant.Type.of(0);
 	public static final DecalPushConstant.Type SPEED = DecalPushConstant.Type.of(0);
 
-	public static final AssemblyType ASSEMBLY = new AssemblyType(
+	public static final AssemblyType MANUAL_PRESS = new AssemblyType(
 			Set.of(CRANK, SPEED),
 			List.of(new BlockPos(0, 0, 0), new BlockPos(0, 1, 0), new BlockPos(0, 0, -1)),
 			VoxelUtil.begin().addCuboid(0, 0, 0, 16, 16, 16).addCuboid(2, 2, -13, 14, 14, 0).addCuboid(0, 16, 0, 16, 32, 16).build(),
 			BlockSoundGroup.ANVIL,
-			AssemblyInstance::new,
+			ManualPressAssembly::new,
 			(tooltips, context) -> {}
 	);
 
 	public static final DebugItem DEBUG_ITEM = new DebugItem(ITEM_SETTINGS);
 	public static final AssemblyBlock PART = new AssemblyBlock(AbstractBlock.Settings.create().allowsSpawning(Blocks::never).ticksRandomly().strength(0.5f, 0.5f).mapColor(DyeColor.LIGHT_GRAY).pistonBehavior(PistonBehavior.BLOCK).solid());
-	public static final AssemblyItem TEST_ITEM = new AssemblyItem(ITEM_SETTINGS, ASSEMBLY);
+	public static final AssemblyItem TEST_ITEM = new AssemblyItem(ITEM_SETTINGS, MANUAL_PRESS);
 	public static final BlockEntityType<AssemblyBlockEntity> ASSEMBLY_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(AssemblyBlockEntity::new, PART).build();
 
 	@Override
@@ -70,7 +70,7 @@ public class Rust implements ModInitializer {
 		Registry.register(Registries.SOUND_EVENT, ROTATE_SOUND_ID, ROTATE_SOUND_EVENT);
 		Registry.register(Registries.ITEM, id("debug"), DEBUG_ITEM);
 
-		Registry.register(RustRegistries.ASSEMBLY, id("test"), ASSEMBLY);
+		Registry.register(RustRegistries.ASSEMBLY, id("test"), MANUAL_PRESS);
 		Registry.register(RustRegistries.CONSTANT, id("crank"), CRANK);
 		Registry.register(RustRegistries.CONSTANT, id("speed"), SPEED);
 
