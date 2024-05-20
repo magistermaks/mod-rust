@@ -17,12 +17,8 @@ import java.util.Optional;
 
 public class AssemblyBlockEntityRenderer implements BlockEntityRenderer<AssemblyBlockEntity> {
 
-	private final BlockRenderManager manager;
-	private final TextRenderer text;
-
 	public AssemblyBlockEntityRenderer(BlockEntityRendererFactory.Context ctx) {
-		this.manager = ctx.getRenderManager();
-		text = ctx.getTextRenderer();
+
 	}
 
 	@Override

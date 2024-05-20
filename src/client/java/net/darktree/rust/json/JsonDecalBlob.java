@@ -6,6 +6,7 @@ import net.darktree.rust.RustRegistries;
 import net.darktree.rust.assembly.decal.ConfiguredDecal;
 import net.darktree.rust.assembly.decal.DecalConfig;
 import net.darktree.rust.assembly.decal.DecalType;
+import net.darktree.rust.render.model.RustModels;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
@@ -23,6 +24,8 @@ public class JsonDecalBlob {
 		this.decal = decal;
 		this.block = block;
 		this.config = config;
+
+		RustModels.MODELS.addAll(config.getModels());
 	}
 
 	private static BlockPos getBlockPos(JsonArray array) {

@@ -4,6 +4,7 @@ import net.darktree.rust.Rust;
 import net.darktree.rust.RustRegistries;
 import net.darktree.rust.assembly.AssemblyType;
 import net.darktree.rust.assembly.decal.AssemblyDecalManager;
+import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -12,6 +13,8 @@ import net.minecraft.util.JsonHelper;
 import net.minecraft.util.profiler.Profiler;
 
 import java.io.BufferedReader;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -35,12 +38,12 @@ public class JsonAssemblyLoader implements SimpleResourceReloadListener<Map<Asse
 					Resource resource = manager.getResourceOrThrow(definition);
 
 					try (BufferedReader reader = resource.getReader()) {
-						map.put(type, JsonAssemblyBlob.of(JsonHelper.deserialize(reader)));
+						map.put(type, JsonAssemblyBlob.of(type, JsonHelper.deserialize(reader)));
 					}
 
 				} catch (Exception e) {
 					Rust.LOGGER.error("Loading failed for assembly definition '{}'", id, e);
-					map.put(type, JsonAssemblyBlob.missing());
+					map.put(type, JsonAssemblyBlob.missing(type));
 				}
 			});
 

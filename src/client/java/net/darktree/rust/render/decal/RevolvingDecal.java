@@ -22,6 +22,8 @@ import net.minecraft.world.World;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 public class RevolvingDecal implements ServerAssemblyDecal, ClientAssemblyDecal {
@@ -172,6 +174,10 @@ public class RevolvingDecal implements ServerAssemblyDecal, ClientAssemblyDecal 
 			tint = parseVector4f(json, "tint", new Vector4f(1, 1, 1, 1));
 			uniform = parseDecalPushConstant(json, "uniform", null);
 			model = parseIdentifier(json, "model", null);
+		}
+
+		public Collection<? extends Identifier> getModels() {
+			return Collections.singletonList(this.model);
 		}
 
 	}

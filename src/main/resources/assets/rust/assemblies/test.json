@@ -1,5 +1,5 @@
 {
-	"model": "assembly/test.json",
+	"model": "rust:assembly/test",
 	"decals": [
 		{
 			"decal": "rust:revolving",
