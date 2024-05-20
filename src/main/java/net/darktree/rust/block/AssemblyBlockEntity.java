@@ -1,8 +1,7 @@
-package net.darktree.rust.block.entity;
+package net.darktree.rust.block;
 
 import net.darktree.rust.Rust;
 import net.darktree.rust.assembly.AssemblyInstance;
-import net.darktree.rust.block.AssemblyBlock;
 import net.darktree.rust.util.DebugAppender;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

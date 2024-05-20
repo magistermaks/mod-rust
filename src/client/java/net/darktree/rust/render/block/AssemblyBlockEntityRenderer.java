@@ -1,8 +1,9 @@
-package net.darktree.rust.render.decal;
+package net.darktree.rust.render.block;
 
 import net.darktree.rust.assembly.AssemblyInstance;
-import net.darktree.rust.block.entity.AssemblyBlockEntity;
-import net.darktree.rust.block.entity.ServerAssemblyDecal;
+import net.darktree.rust.block.AssemblyBlockEntity;
+import net.darktree.rust.assembly.decal.ServerAssemblyDecal;
+import net.darktree.rust.render.decal.ClientAssemblyDecal;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -11,7 +12,6 @@ import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.BlockRotation;
 
 import java.util.Optional;
 

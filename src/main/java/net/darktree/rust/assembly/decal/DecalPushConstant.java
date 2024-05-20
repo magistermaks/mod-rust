@@ -1,4 +1,4 @@
-package net.darktree.rust.block.entity;
+package net.darktree.rust.assembly.decal;
 
 import net.minecraft.util.math.MathHelper;
 

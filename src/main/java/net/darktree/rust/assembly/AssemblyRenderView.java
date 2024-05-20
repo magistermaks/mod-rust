@@ -1,6 +1,6 @@
 package net.darktree.rust.assembly;
 
-import net.darktree.rust.block.entity.DecalPushConstant;
+import net.darktree.rust.assembly.decal.DecalPushConstant;
 import net.minecraft.util.BlockRotation;
 
 public interface AssemblyRenderView {

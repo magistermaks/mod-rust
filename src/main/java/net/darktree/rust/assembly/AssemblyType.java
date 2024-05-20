@@ -1,10 +1,13 @@
 package net.darktree.rust.assembly;
 
-import com.google.common.collect.Maps;
 import net.darktree.rust.Rust;
 import net.darktree.rust.RustRegistries;
+import net.darktree.rust.assembly.decal.AssemblyDecalManager;
+import net.darktree.rust.assembly.decal.ConfiguredDecal;
+import net.darktree.rust.assembly.decal.DecalPushConstant;
+import net.darktree.rust.assembly.decal.ServerAssemblyDecal;
 import net.darktree.rust.block.AssemblyBlock;
-import net.darktree.rust.block.entity.*;
+import net.darktree.rust.block.AssemblyBlockEntity;
 import net.darktree.rust.util.BlockUtil;
 import net.darktree.rust.util.ContainerUtil;
 import net.fabricmc.api.EnvType;
@@ -138,7 +141,7 @@ public final class AssemblyType {
 	}
 
 	public Map<BlockPos, List<? extends ServerAssemblyDecal>> createDecalMap() {
-		return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER ? null : ContainerUtil.remap(AssemblyDecalManager.getDecals(this), HashMap::new, list -> list.stream().map(DecalType::create).toList());
+		return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER ? null : ContainerUtil.remap(AssemblyDecalManager.getDecals(this), HashMap::new, list -> list.stream().map(ConfiguredDecal::create).toList());
 	}
 
 	public Map<BlockPos, List<? extends ServerAssemblyDecal>> getSharedDecalMap() {

@@ -2,8 +2,7 @@ package net.darktree.rust.render.model;
 
 import net.darktree.rust.Rust;
 import net.darktree.rust.assembly.AssemblyType;
-import net.darktree.rust.block.AssemblyBlock;
-import net.darktree.rust.block.entity.AssemblyBlockEntity;
+import net.darktree.rust.block.AssemblyBlockEntity;
 import net.darktree.rust.util.BlockUtil;
 import net.darktree.rust.util.duck.UnbakedMultiblockView;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;

@@ -3,7 +3,6 @@ package net.darktree.rust.block;
 import net.darktree.rust.Rust;
 import net.darktree.rust.assembly.AssemblyConfig;
 import net.darktree.rust.assembly.AssemblyInstance;
-import net.darktree.rust.block.entity.AssemblyBlockEntity;
 import net.darktree.rust.util.BlockUtil;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;

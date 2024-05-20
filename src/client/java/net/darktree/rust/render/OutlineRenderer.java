@@ -5,7 +5,7 @@ import net.darktree.rust.RustClient;
 import net.darktree.rust.assembly.AssemblyConfig;
 import net.darktree.rust.assembly.AssemblyFallbackRenderView;
 import net.darktree.rust.assembly.AssemblyType;
-import net.darktree.rust.block.entity.ServerAssemblyDecal;
+import net.darktree.rust.assembly.decal.ServerAssemblyDecal;
 import net.darktree.rust.item.AssemblyItem;
 import net.darktree.rust.network.AssemblyRotationC2SPacket;
 import net.darktree.rust.network.RustPackets;

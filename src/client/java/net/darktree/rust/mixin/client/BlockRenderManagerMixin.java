@@ -2,7 +2,7 @@ package net.darktree.rust.mixin.client;
 
 import net.darktree.rust.Rust;
 import net.darktree.rust.assembly.AssemblyInstance;
-import net.darktree.rust.block.entity.AssemblyBlockEntity;
+import net.darktree.rust.block.AssemblyBlockEntity;
 import net.darktree.rust.render.model.AssemblyModel;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
