@@ -10,6 +10,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockRenderView;
@@ -41,15 +42,24 @@ public class RenderHelper {
 	/**
 	 * Render flat quad into given vertex consumer
 	 */
-	public static void renderFlatQuad(VertexConsumer consumer, MatrixStack.Entry matrix, BakedQuad quad, float brightnesses, int lights, int overlay) {
+	public static void renderFlatQuad(VertexConsumer consumer, MatrixStack.Entry matrix, BakedQuad quad, BlockRenderView world, int lights, int overlay) {
 		Vec3i face = quad.getFace().getVector();
 		Matrix4f origin = matrix.getPositionMatrix();
-		Vector3f normal = matrix.getNormalMatrix().transform(new Vector3f(face.getX(), face.getY(), face.getZ()));
+		Vector3f facing = new Vector3f(face.getX(), face.getY(), face.getZ());
+		Vector3f normal = matrix.getNormalMatrix().transform(new Vector3f(facing));
 
 		int[] vertices = quad.getVertexData();
 		int j = vertices.length / 8;
 
 		Vector4f tmp = new Vector4f(1.0f);
+
+		float diffuse = 0;
+
+		for (Direction dir : Direction.values()) {
+			diffuse += MathHelper.clamp(dir.getUnitVector().dot(normal), 0.0f, 1.0f) * world.getBrightness(dir, true);
+		}
+
+		diffuse = MathHelper.clamp(diffuse * 0.7f + 0.3f, 0, 1);
 
 		for (int i = 0; i < j; i ++) {
 			int vertex = i * 8;
@@ -59,16 +69,16 @@ public class RenderHelper {
 			tmp.z = Float.intBitsToFloat(vertices[vertex + 2]);
 
 			int bytes = vertices[vertex + 3];
-			float r = brightnesses * tr * ((bytes & 0xFF) / 255.0f);
-			float g = brightnesses * tg * (((bytes >> 8) & 0xFF) / 255.0f);
-			float b = brightnesses * tb * (((bytes >> 16) & 0xFF) / 255.0f);
+			float r = diffuse * tr * ((bytes & 0xFF) / 255.0f);
+			float g = diffuse * tg * (((bytes >> 8) & 0xFF) / 255.0f);
+			float b = diffuse * tb * (((bytes >> 16) & 0xFF) / 255.0f);
 			float a = ta;
 
 			float u = Float.intBitsToFloat(vertices[vertex + 4]);
 			float v = Float.intBitsToFloat(vertices[vertex + 5]);
 
 			Vector4f position = origin.transform(tmp);
-			consumer.vertex(position.x(), position.y(), position.z(), r, g, b, a, u, v, overlay, lights, normal.x(), normal.y(), normal.z());
+			consumer.vertex(position.x(), position.y(), position.z(), r, g, b, a, u, v, overlay, lights, 1, 1, 1);
 		}
 	}
 
@@ -77,8 +87,7 @@ public class RenderHelper {
 	 */
 	public static void renderFlatQuads(BlockRenderView world, int light, int overlay, MatrixStack matrices, VertexConsumer vertexConsumer, List<BakedQuad> quads) {
 		for (BakedQuad bakedQuad : quads) {
-			float brightness = world.getBrightness(Direction.NORTH, bakedQuad.hasShade());
-			renderFlatQuad(vertexConsumer, matrices.peek(), bakedQuad, brightness, light, overlay);
+			renderFlatQuad(vertexConsumer, matrices.peek(), bakedQuad, world, light, overlay);
 		}
 	}
 

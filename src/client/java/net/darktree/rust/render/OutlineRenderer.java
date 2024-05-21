@@ -130,6 +130,7 @@ public class OutlineRenderer implements WorldRenderEvents.AfterEntities {
 					matrices.translate(0.0005f, 0.0005f, 0.0005f);
 					matrices.scale(0.999f, 0.999f, 0.999f);
 
+					// TODO set shading mode?
 					RenderHelper.setTint(this.r, this.g, this.b, a);
 					RenderHelper.renderModel(model, context.world(), pos, buffer, matrices, 0, 42);
 					matrices.pop();

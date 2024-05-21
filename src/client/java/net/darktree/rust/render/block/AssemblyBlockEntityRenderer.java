@@ -28,6 +28,10 @@ public class AssemblyBlockEntityRenderer implements BlockEntityRenderer<Assembly
 
 		if (optional.isPresent()) {
 
+			// fix for minecraft's broken normals
+			matrices.push();
+			matrices.peek().getNormalMatrix().identity();
+
 			final AssemblyInstance instance = optional.get();
 			final VertexConsumer consumer = vertexConsumers.getBuffer(RenderLayer.getSolid());
 
@@ -36,6 +40,8 @@ public class AssemblyBlockEntityRenderer implements BlockEntityRenderer<Assembly
 
 				client.render(entity.getWorld(), entity.getPos(), instance, delta, matrices, consumer, overlay, 1, 1, 1, 1);
 			}
+
+			matrices.pop();
 
 		}
 
