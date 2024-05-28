@@ -37,6 +37,16 @@ public class AssemblyBlock extends BlockWithEntity {
 		super.setDefaultState(getDefaultState().with(CENTRAL, false));
 	}
 
+	/**
+	 * This shape controls the culling of nearby blocks
+	 * For now we disable all culling, but it would be beneficial
+	 * to perform at least SOME culling in the future
+	 */
+	@Override
+	public VoxelShape getCullingShape(BlockState state, BlockView world, BlockPos pos) {
+		return VoxelShapes.empty();
+	}
+
 	public Optional<AssemblyInstance> getAssembly(BlockView world, BlockPos pos) {
 		return BlockUtil.getBlockEntity(world, pos, AssemblyBlockEntity.class).flatMap(AssemblyBlockEntity::getAssembly);
 	}
@@ -54,7 +64,7 @@ public class AssemblyBlock extends BlockWithEntity {
 
 	@Override
 	public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		return BlockUtil.getBlockEntity(world, pos, AssemblyBlockEntity.class).map(AssemblyBlockEntity::getShape).orElse(VoxelShapes.empty());
+		return BlockUtil.getBlockEntity(world, pos, AssemblyBlockEntity.class).map(AssemblyBlockEntity::getRelativeShape).orElse(VoxelShapes.empty());
 	}
 
 	@Override

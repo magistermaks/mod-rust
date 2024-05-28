@@ -2,9 +2,9 @@ package net.darktree.rust;
 
 import net.darktree.rust.assembly.AssemblyType;
 import net.darktree.rust.assembly.ManualPressAssembly;
+import net.darktree.rust.assembly.decal.DecalPushConstant;
 import net.darktree.rust.block.AssemblyBlock;
 import net.darktree.rust.block.AssemblyBlockEntity;
-import net.darktree.rust.assembly.decal.DecalPushConstant;
 import net.darktree.rust.item.AssemblyItem;
 import net.darktree.rust.item.DebugItem;
 import net.darktree.rust.network.RustPackets;

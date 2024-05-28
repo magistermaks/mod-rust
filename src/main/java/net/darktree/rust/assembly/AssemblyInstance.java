@@ -2,7 +2,6 @@ package net.darktree.rust.assembly;
 
 import net.darktree.rust.Rust;
 import net.darktree.rust.RustRegistries;
-import net.darktree.rust.block.AssemblyBlock;
 import net.darktree.rust.assembly.decal.DecalPushConstant;
 import net.darktree.rust.assembly.decal.ServerAssemblyDecal;
 import net.darktree.rust.util.DebugAppender;
@@ -18,8 +17,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.World;
@@ -116,10 +113,10 @@ public abstract class AssemblyInstance implements AssemblyRenderView, DebugAppen
 		return type;
 	}
 
-	public final VoxelShape getShape(BlockPos offset) {
-		return config.getShape(offset);
+	public final VoxelShape getWholeShape(BlockPos offset) {
+		return config.getWholeShape(offset);
 	}
-
+	
 	public final AssemblyConfig getConfig() {
 		return config;
 	}

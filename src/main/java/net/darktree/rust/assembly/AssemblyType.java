@@ -78,7 +78,7 @@ public final class AssemblyType {
 		BlockPos.Mutable target = new BlockPos.Mutable();
 		AssemblyConfig config = rotations.get(rotation);
 
-		if (!world.doesNotIntersectEntities(null, config.getShape(origin))) {
+		if (!world.doesNotIntersectEntities(null, config.getWholeShape(origin))) {
 			return false;
 		}
 

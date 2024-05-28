@@ -25,9 +25,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Optional;
 
 /**
- * This mixin is used to render the block damage overlay over the whole assembly
- * no mater which of its blocks is being actually damaged by replacing the rendering
- * logic for our Assembly Part block (getting a custom model from AssemblyModel class)
+ * This mixin is used to render the block damage overlay over
+ * the whole assembly no mater which of its blocks is being actually
+ * damaged by replacing the rendering logic for our Assembly Part
+ * block (getting a custom model from AssemblyModel class)
  */
 @Mixin(BlockRenderManager.class)
 public abstract class BlockRenderManagerMixin {
@@ -44,7 +45,7 @@ public abstract class BlockRenderManagerMixin {
 			cancellable = true
 	)
 	public void renderDamage(BlockState state, BlockPos pos, BlockRenderView world, MatrixStack matrices, VertexConsumer consumer, CallbackInfo info) {
-		if (state.getBlock() == Rust.PART /*&& !state.get(AssemblyBlock.CENTRAL)*/) {
+		if (state.getBlock() == Rust.PART) {
 			BlockEntity entity = world.getBlockEntity(pos);
 
 			if (entity instanceof AssemblyBlockEntity assemblyEntity) {

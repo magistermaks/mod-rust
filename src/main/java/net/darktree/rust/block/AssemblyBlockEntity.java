@@ -106,8 +106,8 @@ public class AssemblyBlockEntity extends BlockEntity implements DebugAppender {
 		this.assembly = new WeakReference<>(instance);
 	}
 
-	public VoxelShape getShape() {
-		return getAssembly().map(instance -> instance.getShape(offset)).orElse(VoxelShapes.empty());
+	public VoxelShape getRelativeShape() {
+		return getAssembly().map(instance -> instance.getWholeShape(offset)).orElse(VoxelShapes.empty());
 	}
 
 	public BlockRotation getRotation() {

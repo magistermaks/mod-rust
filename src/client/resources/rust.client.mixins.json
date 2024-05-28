@@ -5,6 +5,7 @@
 	"client": [
 		"BlockRenderManagerMixin",
 		"JsonUnbakedModelMixin",
+		"ModelElementMixin",
 		"ModelLoaderMixin",
 		"RenderLayerMixin"
 	],

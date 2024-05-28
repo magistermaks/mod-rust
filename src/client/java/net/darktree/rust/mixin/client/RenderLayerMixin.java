@@ -10,6 +10,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Changes vertex sorter for our custom outline render layer
+ * by searching for its usage by comparing its identifier with
+ * the {@code OutlineRenderLayer#isOutlineLayer()} method.
+ */
 @Mixin(RenderLayer.class)
 public abstract class RenderLayerMixin extends RenderPhase {
 

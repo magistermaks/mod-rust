@@ -65,7 +65,7 @@ public class AssemblyModel implements UnbakedModel, BakedModel, FabricBakedModel
 
 	@Override
 	public boolean useAmbientOcclusion() {
-		return false;
+		return true;
 	}
 
 	@Override
